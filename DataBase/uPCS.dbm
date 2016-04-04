@@ -1,0 +1,632 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+CAUTION: Do not modify this file unless you know what you are doing.
+         Unexpected results may occur if the code is changed deliberately.
+-->
+<dbmodel pgmodeler-ver="0.8.2-beta" author="Alkor" last-position="22,0" last-zoom="0.85"
+	 default-schema="public" default-owner="postgres">
+<database name="uPCStore">
+</database>
+
+<schema name="public" fill-color="#e1e1e1" sql-disabled="true">
+</schema>
+
+<table name="users">
+	<schema name="public"/>
+	<role name="postgres"/>
+	<comment><![CDATA[Table contains users auth data]]></comment>
+	<position x="504.705" y="72.9412"/>
+	<column name="id_user" not-null="true">
+		<type name="bigserial"/>
+	</column>
+	<column name="login_user" not-null="true">
+		<type name="varchar" length="64"/>
+	</column>
+	<column name="email_user" not-null="true">
+		<type name="varchar" length="64"/>
+	</column>
+	<column name="password_user" not-null="true">
+		<type name="char" length="64"/>
+	</column>
+	<column name="reg_date_user" not-null="true">
+		<type name="date"/>
+	</column>
+	<column name="group_user" not-null="true">
+		<type name="bigint"/>
+	</column>
+	<constraint name="pk_id_user" type="pk-constr" table="public.users">
+		<columns names="id_user" ref-type="src-columns"/>
+	</constraint>
+	<constraint name="uniq_users" type="uq-constr" table="public.users">
+		<columns names="login_user" ref-type="src-columns"/>
+	</constraint>
+	<constraint name="chk_users_uname" type="ck-constr" table="public.users">
+			<expression><![CDATA[login_user  != '' ]]></expression>
+	</constraint>
+	<constraint name="chk_users_email" type="ck-constr" table="public.users">
+			<expression><![CDATA[email_user  ~ '^[A-Za-z0-9._%-]+@[A-Za-z0-9.-]+[.][A-Za-z]+$']]></expression>
+	</constraint>
+	<constraint name="uniq_email_usr" type="uq-constr" table="public.users">
+		<columns names="email_user" ref-type="src-columns"/>
+	</constraint>
+</table>
+
+<index name="ind_users_uname" table="public.users"
+	 concurrent="false" unique="true" fast-update="false" buffering="false"
+	 index-type="btree" factor="0">
+		<idxelement use-sorting="false">
+			<column name="login_user"/>
+		</idxelement>
+</index>
+
+<index name="und_users_email" table="public.users"
+	 concurrent="false" unique="true" fast-update="false" buffering="false"
+	 index-type="btree" factor="0">
+		<idxelement use-sorting="false">
+			<column name="email_user"/>
+		</idxelement>
+</index>
+
+<table name="users_paydata">
+	<schema name="public"/>
+	<position x="907.059" y="57.6471"/>
+	<column name="card_number" not-null="true">
+		<type name="char" length="16"/>
+	</column>
+	<column name="card_expire_date" not-null="true">
+		<type name="date"/>
+	</column>
+	<column name="card_owner_id" not-null="true">
+		<type name="bigint"/>
+	</column>
+	<column name="name_owner">
+		<type name="varchar" length="64"/>
+	</column>
+	<column name="surname_owner">
+		<type name="varchar" length="64"/>
+	</column>
+	<column name="middlename_owner">
+		<type name="varchar" length="64"/>
+	</column>
+	<constraint name="pk_paydata" type="pk-constr" table="public.users_paydata">
+		<columns names="card_number,card_expire_date" ref-type="src-columns"/>
+	</constraint>
+	<constraint name="chk_paydata_card_number" type="ck-constr" table="public.users_paydata">
+			<expression><![CDATA[card_number  ~ '[0-9]{13,16}']]></expression>
+	</constraint>
+	<constraint name="chk_not_empty_user" type="ck-constr" sql-disabled="true" table="public.users_paydata">
+			<expression><![CDATA[name_owner != '' AND surname_owner != '' AND middlename_owner != '']]></expression>
+	</constraint>
+</table>
+
+<index name="ind_cardnum_carddate" table="public.users_paydata"
+	 concurrent="false" unique="true" fast-update="false" buffering="false"
+	 index-type="btree" factor="0">
+		<idxelement use-sorting="false">
+			<column name="card_number"/>
+		</idxelement>
+		<idxelement use-sorting="true" nulls-first="false" asc-order="true">
+			<column name="card_expire_date"/>
+		</idxelement>
+</index>
+
+<table name="items">
+	<schema name="public"/>
+	<role name="postgres"/>
+	<position x="64.7059" y="395.294"/>
+	<column name="id_item" not-null="true">
+		<type name="bigserial"/>
+	</column>
+	<column name="type_id_item" not-null="true">
+		<type name="bigint"/>
+	</column>
+	<column name="name_item" not-null="true">
+		<type name="varchar" length="64"/>
+	</column>
+	<column name="price_item_usd" not-null="true">
+		<type name="bigint"/>
+	</column>
+	<column name="count_in_storage_item" not-null="true">
+		<type name="bigint"/>
+	</column>
+	<constraint name="pk_id_item" type="pk-constr" table="public.items">
+		<columns names="id_item" ref-type="src-columns"/>
+	</constraint>
+	<constraint name="chk_price" type="ck-constr" table="public.items">
+			<expression><![CDATA[price_item_usd > 0]]></expression>
+	</constraint>
+	<constraint name="chk_item_name" type="ck-constr" table="public.items">
+			<expression><![CDATA[name_item != '']]></expression>
+	</constraint>
+	<constraint name="chk_count_items" type="ck-constr" table="public.items">
+			<expression><![CDATA[count_in_storage_item >= 0]]></expression>
+	</constraint>
+</table>
+
+<index name="ind_item_id" table="public.items"
+	 concurrent="false" unique="false" fast-update="false" buffering="false"
+	 index-type="btree" factor="0">
+		<idxelement use-sorting="false">
+			<column name="id_item"/>
+		</idxelement>
+</index>
+
+<index name="ind_item_type" table="public.items"
+	 concurrent="false" unique="false" fast-update="false" buffering="false"
+	 index-type="btree" factor="0">
+		<idxelement use-sorting="false">
+			<column name="type_id_item"/>
+		</idxelement>
+</index>
+
+<table name="item_types">
+	<schema name="public"/>
+	<role name="postgres"/>
+	<position x="512.941" y="530.588"/>
+	<column name="id_item_type" not-null="true">
+		<type name="bigserial"/>
+	</column>
+	<column name="name_type_item" not-null="true">
+		<type name="varchar" length="64"/>
+	</column>
+	<constraint name="pk_item_types" type="pk-constr" table="public.item_types">
+		<columns names="id_item_type" ref-type="src-columns"/>
+	</constraint>
+	<constraint name="chk_name_type" type="ck-constr" table="public.item_types">
+			<expression><![CDATA[name_type_item != '']]></expression>
+	</constraint>
+</table>
+
+<table name="characterisitcs">
+	<schema name="public"/>
+	<role name="postgres"/>
+	<position x="903.529" y="382.353"/>
+	<column name="id_char" not-null="true">
+		<type name="bigserial"/>
+	</column>
+	<column name="name_char" not-null="true">
+		<type name="varchar" length="64"/>
+	</column>
+	<column name="id_item_owner_type" not-null="true">
+		<type name="bigint"/>
+	</column>
+	<constraint name="pk_characteristics" type="pk-constr" table="public.characterisitcs">
+		<columns names="id_char" ref-type="src-columns"/>
+	</constraint>
+	<constraint name="chk_name_Char" type="ck-constr" table="public.characterisitcs">
+			<expression><![CDATA[name_char != '']]></expression>
+	</constraint>
+</table>
+
+<table name="char_text_values">
+	<schema name="public"/>
+	<role name="postgres"/>
+	<position x="529.412" y="257.647"/>
+	<column name="id_char" not-null="true">
+		<type name="bigint"/>
+	</column>
+	<column name="id_item" not-null="true">
+		<type name="bigint"/>
+	</column>
+	<column name="value" not-null="true">
+		<type name="varchar" length="64"/>
+	</column>
+	<constraint name="pk_char_text_vals" type="pk-constr" table="public.char_text_values">
+		<columns names="id_item,id_char" ref-type="src-columns"/>
+	</constraint>
+	<constraint name="chk_text_val_nnull" type="ck-constr" table="public.char_text_values">
+			<expression><![CDATA[value != '']]></expression>
+	</constraint>
+</table>
+
+<index name="ind_text_vals" table="public.char_text_values"
+	 concurrent="false" unique="true" fast-update="false" buffering="false"
+	 index-type="btree" factor="0">
+		<idxelement use-sorting="true" nulls-first="false" asc-order="true">
+			<column name="id_item"/>
+		</idxelement>
+		<idxelement use-sorting="false">
+			<column name="id_char"/>
+		</idxelement>
+</index>
+
+<table name="orders">
+	<schema name="public"/>
+	<role name="postgres"/>
+	<position x="80" y="80"/>
+	<column name="id_order" not-null="true">
+		<type name="bigserial"/>
+	</column>
+	<column name="id_customer" not-null="true">
+		<type name="bigint"/>
+	</column>
+	<column name="order_date">
+		<type name="date"/>
+	</column>
+	<constraint name="pk_orders" type="pk-constr" table="public.orders">
+		<columns names="id_order" ref-type="src-columns"/>
+	</constraint>
+</table>
+
+<table name="orders_items">
+	<schema name="public"/>
+	<role name="postgres"/>
+	<position x="80" y="220"/>
+	<column name="id_order" not-null="true">
+		<type name="bigint"/>
+	</column>
+	<column name="id_item" not-null="true">
+		<type name="bigint"/>
+	</column>
+	<column name="item_count" not-null="true">
+		<type name="integer"/>
+	</column>
+	<constraint name="pk_orders_items" type="pk-constr" table="public.orders_items">
+		<columns names="id_order,id_item" ref-type="src-columns"/>
+	</constraint>
+	<constraint name="chk_item_count" type="ck-constr" table="public.orders_items">
+			<expression><![CDATA[item_count > 0]]></expression>
+	</constraint>
+</table>
+
+<table name="char_float_values">
+	<schema name="public"/>
+	<role name="postgres"/>
+	<position x="548.235" y="383.529"/>
+	<column name="id_char" not-null="true">
+		<type name="bigint"/>
+	</column>
+	<column name="id_item" not-null="true">
+		<type name="bigint"/>
+	</column>
+	<column name="value" not-null="true">
+		<type name="float"/>
+	</column>
+	<constraint name="pk_float_values" type="pk-constr" table="public.char_float_values">
+		<columns names="id_char,id_item" ref-type="src-columns"/>
+	</constraint>
+</table>
+
+<index name="int_float_vals" table="public.char_float_values"
+	 concurrent="false" unique="true" fast-update="false" buffering="false"
+	 index-type="btree" factor="0">
+		<idxelement use-sorting="false">
+			<column name="id_item"/>
+		</idxelement>
+		<idxelement use-sorting="false">
+			<column name="id_char"/>
+		</idxelement>
+</index>
+
+<table name="user_groups">
+	<schema name="public"/>
+	<role name="postgres"/>
+	<appended-sql><![CDATA[INSERT INTO user_groups  VALUES (1, 'User', 0);
+INSERT INTO user_groups  VALUES (2, 'Seller', 50);
+INSERT INTO user_groups  VALUES (3, 'Admin', 100);]]></appended-sql>
+	<position x="903.529" y="211.765"/>
+	<column name="id_group" not-null="true">
+		<type name="bigserial"/>
+	</column>
+	<column name="name_group" not-null="true">
+		<type name="varchar" length="64"/>
+	</column>
+	<column name="access_power" not-null="true">
+		<type name="smallint"/>
+	</column>
+	<constraint name="pk_user_groups" type="pk-constr" table="public.user_groups">
+		<columns names="id_group" ref-type="src-columns"/>
+	</constraint>
+	<constraint name="chk_name_group" type="ck-constr" table="public.user_groups">
+			<expression><![CDATA[name_group !='']]></expression>
+	</constraint>
+</table>
+
+<function name="create_user"
+		window-func="false"
+		returns-setof="false"
+		behavior-type="CALLED ON NULL INPUT"
+		function-type="VOLATILE"
+		security-type="SECURITY INVOKER"
+		execution-cost="1"
+		row-amount="0">
+	<schema name="public"/>
+	<role name="postgres"/>
+	<language name="sql" sql-disabled="true"/>
+	<return-type>
+	<type name="void"/>
+	</return-type>
+	<parameter name="login" in="true">
+		<type name="varchar" length="64"/>
+	</parameter>
+	<parameter name="email" in="true">
+		<type name="varchar" length="64"/>
+	</parameter>
+	<parameter name="password" in="true">
+		<type name="char" length="64"/>
+	</parameter>
+	<parameter name="card_num" in="true">
+		<type name="char" length="16"/>
+	</parameter>
+	<parameter name="card_date" in="true">
+		<type name="date"/>
+	</parameter>
+	<parameter name="name" in="true">
+		<type name="varchar" length="64"/>
+	</parameter>
+	<parameter name="surname" in="true">
+		<type name="varchar" length="64"/>
+	</parameter>
+	<parameter name="middlename" in="true">
+		<type name="varchar" length="64"/>
+	</parameter>
+	<definition><![CDATA[INSERT INTO users(login_user, email_user, password_user, reg_date_user, group_user)
+VALUES(login, email, password, now(), 1);
+
+INSERT INTO users_paydata
+VALUES(card_num, card_date, (SELECT id_user FROM users WHERE login_user = login), name, surname,  middlename);]]></definition>
+</function>
+
+<function name="create_char"
+		window-func="false"
+		returns-setof="false"
+		behavior-type="RETURNS NULL ON NULL INPUT"
+		function-type="VOLATILE"
+		security-type="SECURITY INVOKER"
+		execution-cost="1"
+		row-amount="0">
+	<schema name="public"/>
+	<role name="postgres"/>
+	<language name="sql" sql-disabled="true"/>
+	<return-type>
+	<type name="void"/>
+	</return-type>
+	<parameter name="name" in="true">
+		<type name="varchar" length="64"/>
+	</parameter>
+	<parameter name="owner_id" in="true">
+		<type name="bigint"/>
+	</parameter>
+	<definition><![CDATA[INSERT INTO characteristics(name_char, id_item_owner_type)
+VALUES (name, owner_id);]]></definition>
+</function>
+
+<function name="create_item_type"
+		window-func="false"
+		returns-setof="false"
+		behavior-type="RETURNS NULL ON NULL INPUT"
+		function-type="VOLATILE"
+		security-type="SECURITY INVOKER"
+		execution-cost="1"
+		row-amount="0">
+	<schema name="public"/>
+	<role name="postgres"/>
+	<language name="sql" sql-disabled="true"/>
+	<return-type>
+	<type name="void"/>
+	</return-type>
+	<parameter name="name" in="true">
+		<type name="varchar" length="64"/>
+	</parameter>
+	<definition><![CDATA[INSERT INTO item_types(name_type_item)
+VALUES (name);]]></definition>
+</function>
+
+<function name="create_text_value"
+		window-func="false"
+		returns-setof="false"
+		behavior-type="CALLED ON NULL INPUT"
+		function-type="VOLATILE"
+		security-type="SECURITY INVOKER"
+		execution-cost="1"
+		row-amount="0">
+	<schema name="public"/>
+	<role name="postgres"/>
+	<language name="sql" sql-disabled="true"/>
+	<return-type>
+	<type name="void"/>
+	</return-type>
+	<parameter name="char_id" in="true">
+		<type name="bigint"/>
+	</parameter>
+	<parameter name="item_id" in="true">
+		<type name="bigint"/>
+	</parameter>
+	<parameter name="value_new" in="true">
+		<type name="varchar" length="64"/>
+	</parameter>
+	<definition><![CDATA[INSERT INTO char_text_value
+VALUES (char_id, item_id, value_new);]]></definition>
+</function>
+
+<function name="create_float_value"
+		window-func="false"
+		returns-setof="false"
+		behavior-type="CALLED ON NULL INPUT"
+		function-type="VOLATILE"
+		security-type="SECURITY INVOKER"
+		execution-cost="1"
+		row-amount="0">
+	<schema name="public"/>
+	<role name="postgres"/>
+	<language name="sql" sql-disabled="true"/>
+	<return-type>
+	<type name="void"/>
+	</return-type>
+	<parameter name="char_id" in="true">
+		<type name="bigint"/>
+	</parameter>
+	<parameter name="item_id" in="true">
+		<type name="bigint"/>
+	</parameter>
+	<parameter name="value_new" in="true">
+		<type name="float"/>
+	</parameter>
+	<definition><![CDATA[INSERT INTO char_float_values
+VALUES (char_id, item_id, value_new);]]></definition>
+</function>
+
+<function name="create_item"
+		window-func="false"
+		returns-setof="false"
+		behavior-type="CALLED ON NULL INPUT"
+		function-type="VOLATILE"
+		security-type="SECURITY INVOKER"
+		execution-cost="1"
+		row-amount="0">
+	<schema name="public"/>
+	<role name="postgres"/>
+	<language name="sql" sql-disabled="true"/>
+	<return-type>
+	<type name="void"/>
+	</return-type>
+	<parameter name="type" in="true">
+		<type name="bigint"/>
+	</parameter>
+	<parameter name="name" in="true">
+		<type name="varchar" length="64"/>
+	</parameter>
+	<parameter name="price" in="true">
+		<type name="bigint"/>
+	</parameter>
+	<parameter name="count" in="true">
+		<type name="bigint"/>
+	</parameter>
+	<definition><![CDATA[INSERT INTO items(type_id_item, name_item, price_item_usd, count_in_storage_item)
+VALUES (type, name, price, count);]]></definition>
+</function>
+
+<constraint name="fk_users_groups" type="fk-constr" comparison-type="MATCH FULL"
+	 upd-action="CASCADE" del-action="RESTRICT" ref-table="public.user_groups" table="public.users">
+	<columns names="group_user" ref-type="src-columns"/>
+	<columns names="id_group" ref-type="dst-columns"/>
+</constraint>
+
+<constraint name="fk_card_owner" type="fk-constr" comparison-type="MATCH FULL"
+	 upd-action="CASCADE" del-action="RESTRICT" ref-table="public.users" table="public.users_paydata">
+	<columns names="card_owner_id" ref-type="src-columns"/>
+	<columns names="id_user" ref-type="dst-columns"/>
+</constraint>
+
+<constraint name="fk_id_type" type="fk-constr" comparison-type="MATCH FULL"
+	 upd-action="CASCADE" del-action="RESTRICT" ref-table="public.item_types" table="public.items">
+	<columns names="type_id_item" ref-type="src-columns"/>
+	<columns names="id_item_type" ref-type="dst-columns"/>
+</constraint>
+
+<constraint name="fk_characteristics_itemtype" type="fk-constr" comparison-type="MATCH FULL"
+	 upd-action="CASCADE" del-action="RESTRICT" ref-table="public.item_types" table="public.characterisitcs">
+	<columns names="id_item_owner_type" ref-type="src-columns"/>
+	<columns names="id_item_type" ref-type="dst-columns"/>
+</constraint>
+
+<constraint name="fk_textvals_1" type="fk-constr" comparison-type="MATCH FULL"
+	 upd-action="CASCADE" del-action="RESTRICT" ref-table="public.items" table="public.char_text_values">
+	<columns names="id_item" ref-type="src-columns"/>
+	<columns names="id_item" ref-type="dst-columns"/>
+</constraint>
+
+<constraint name="fk_textvals_2" type="fk-constr" comparison-type="MATCH FULL"
+	 upd-action="CASCADE" del-action="RESTRICT" ref-table="public.characterisitcs" table="public.char_text_values">
+	<columns names="id_char" ref-type="src-columns"/>
+	<columns names="id_char" ref-type="dst-columns"/>
+</constraint>
+
+<constraint name="fk_orders" type="fk-constr" comparison-type="MATCH FULL"
+	 upd-action="CASCADE" del-action="RESTRICT" ref-table="public.users" table="public.orders">
+	<columns names="id_customer" ref-type="src-columns"/>
+	<columns names="id_user" ref-type="dst-columns"/>
+</constraint>
+
+<constraint name="fk_orders_items" type="fk-constr" comparison-type="MATCH FULL"
+	 upd-action="CASCADE" del-action="RESTRICT" ref-table="public.orders" table="public.orders_items">
+	<columns names="id_order" ref-type="src-columns"/>
+	<columns names="id_order" ref-type="dst-columns"/>
+</constraint>
+
+<constraint name="fk_orders_items2" type="fk-constr" comparison-type="MATCH FULL"
+	 upd-action="CASCADE" del-action="RESTRICT" ref-table="public.items" table="public.orders_items">
+	<columns names="id_item" ref-type="src-columns"/>
+	<columns names="id_item" ref-type="dst-columns"/>
+</constraint>
+
+<constraint name="fk_items_float_vals" type="fk-constr" comparison-type="MATCH FULL"
+	 upd-action="CASCADE" del-action="RESTRICT" ref-table="public.items" table="public.char_float_values">
+	<columns names="id_item" ref-type="src-columns"/>
+	<columns names="id_item" ref-type="dst-columns"/>
+</constraint>
+
+<constraint name="fk_chars_float" type="fk-constr" comparison-type="MATCH FULL"
+	 upd-action="CASCADE" del-action="RESTRICT" ref-table="public.characterisitcs" table="public.char_float_values">
+	<columns names="id_char" ref-type="src-columns"/>
+	<columns names="id_char" ref-type="dst-columns"/>
+</constraint>
+
+<relationship name="rel_users_paydata_users" type="relfk"
+	 src-table="public.users_paydata"
+	 dst-table="public.users"
+	 src-required="false" dst-required="false"/>
+
+<relationship name="rel_items_item_types" type="relfk"
+	 src-table="public.items"
+	 dst-table="public.item_types"
+	 src-required="false" dst-required="false"/>
+
+<relationship name="rel_characterisitcs_item_types" type="relfk"
+	 src-table="public.characterisitcs"
+	 dst-table="public.item_types"
+	 src-required="false" dst-required="false">
+	<label ref-type="name-label">
+		<position x="-59.8743" y="1.55147"/>
+	</label>
+</relationship>
+
+<relationship name="rel_char_text_values_items" type="relfk"
+	 src-table="public.char_text_values"
+	 dst-table="public.items"
+	 src-required="false" dst-required="false"/>
+
+<relationship name="rel_char_text_values_characterisitcs" type="relfk"
+	 src-table="public.char_text_values"
+	 dst-table="public.characterisitcs"
+	 src-required="false" dst-required="false"/>
+
+<relationship name="rel_orders_users" type="relfk"
+	 src-table="public.orders"
+	 dst-table="public.users"
+	 src-required="false" dst-required="false">
+	<label ref-type="src-label">
+		<position x="0" y="0"/>
+	</label>
+</relationship>
+
+<relationship name="rel_orders_items_orders" type="relfk"
+	 src-table="public.orders_items"
+	 dst-table="public.orders"
+	 src-required="false" dst-required="false"/>
+
+<relationship name="rel_orders_items_items" type="relfk"
+	 src-table="public.orders_items"
+	 dst-table="public.items"
+	 src-required="false" dst-required="false"/>
+
+<relationship name="rel_char_float_values_items" type="relfk"
+	 src-table="public.char_float_values"
+	 dst-table="public.items"
+	 src-required="false" dst-required="false"/>
+
+<relationship name="rel_char_float_values_characterisitcs" type="relfk"
+	 src-table="public.char_float_values"
+	 dst-table="public.characterisitcs"
+	 src-required="false" dst-required="false">
+	<label ref-type="name-label">
+		<position x="0" y="0"/>
+	</label>
+</relationship>
+
+<relationship name="rel_users_user_groups" type="relfk"
+	 src-table="public.users"
+	 dst-table="public.user_groups"
+	 src-required="false" dst-required="false"/>
+
+</dbmodel>
