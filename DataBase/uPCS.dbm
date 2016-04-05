@@ -3,7 +3,7 @@
 CAUTION: Do not modify this file unless you know what you are doing.
          Unexpected results may occur if the code is changed deliberately.
 -->
-<dbmodel pgmodeler-ver="0.8.2-beta" author="Alkor" last-position="2,2" last-zoom="0.85"
+<dbmodel pgmodeler-ver="0.8.2-beta" author="Alkor" last-position="100,162" last-zoom="0.85"
 	 default-schema="public" default-owner="postgres">
 <role name="admin"
       createdb="true"
@@ -535,7 +535,7 @@ VALUES(ord_id, it_id, it_count);]]></definition>
 	<parameter name="pword" in="true">
 		<type name="varchar" length="64"/>
 	</parameter>
-	<parameter name="grRole" in="true">
+	<parameter name="grrole" in="true">
 		<type name="varchar" length="64"/>
 	</parameter>
 	<definition><![CDATA[BEGIN
@@ -554,7 +554,7 @@ END;]]></definition>
 		row-amount="0">
 	<schema name="public"/>
 	<role name="postgres"/>
-	<language name="sql" sql-disabled="true"/>
+	<language name="plpgsql" sql-disabled="true"/>
 	<return-type>
 	<type name="void"/>
 	</return-type>
@@ -564,7 +564,16 @@ END;]]></definition>
 	<parameter name="groupRoleName" in="true">
 		<type name="varchar" length="64"/>
 	</parameter>
-	<definition><![CDATA[GRANT groupRoleName TO roleName;]]></definition>
+	<parameter name="ifrevoke" in="true">
+		<type name="bool"/>
+	</parameter>
+	<definition><![CDATA[BEGIN
+IF NOT ifrevoke THEN
+	EXECUTE 'GRANT ' || quote_ident($2) || ' TO ' || quote_ident($1);
+ELSE
+	EXECUTE 'REVOKE ' || quote_ident($2) || ' FROM ' || quote_ident($1);
+END IF;
+END;]]></definition>
 </function>
 
 <function name="create_user"
@@ -590,8 +599,24 @@ END;]]></definition>
 	<parameter name="umail" in="true">
 		<type name="varchar" length="64"/>
 	</parameter>
+	<parameter name="cardnum" in="true">
+		<type name="varchar" length="16"/>
+	</parameter>
+	<parameter name="date" in="true">
+		<type name="varchar" length="64"/>
+	</parameter>
+	<parameter name="uname" in="true">
+		<type name="varchar" length="64"/>
+	</parameter>
+	<parameter name="usur" in="true">
+		<type name="varchar" length="64"/>
+	</parameter>
+	<parameter name="umid" in="true">
+		<type name="varchar" length="64"/>
+	</parameter>
 	<definition><![CDATA[BEGIN
 EXECUTE ' INSERT INTO users(login_user, email_user, password_user, reg_date_user, group_user) VALUES (''' || $1 || ''', ''' || $3 || ''', ''' || $2 || ''', ''' || now() || ''', ' || 1 || ')';
+EXECUTE ' INSERT INTO users_paydata VALUES( ' || quote_literal($4) || ', ' || quote_literal(date) || ', (SELECT id_user FROM users WHERE login_user = ' || quote_literal($1) || '), ' || quote_literal(uname) || ', ' || quote_literal(usur) || ', ' || quote_literal(umid) || ')';
 END;]]></definition>
 </function>
 
@@ -683,7 +708,11 @@ END;]]></definition>
 <relationship name="rel_char_text_values_items" type="relfk"
 	 src-table="public.char_text_values"
 	 dst-table="public.items"
-	 src-required="false" dst-required="false"/>
+	 src-required="false" dst-required="false">
+	<label ref-type="name-label">
+		<position x="0" y="0"/>
+	</label>
+</relationship>
 
 <relationship name="rel_char_text_values_characterisitcs" type="relfk"
 	 src-table="public.char_text_values"
@@ -734,7 +763,7 @@ END;]]></definition>
 	<privileges select="true"/>
 </permission>
 <permission>
-	<object name="public.mod_role(IN varchar(64),IN varchar(64))" type="function"/>
+	<object name="public.mod_role(IN varchar(64),IN varchar(64),IN bool)" type="function"/>
 	<roles names="admin"/>
 	<privileges execute="true"/>
 </permission>
