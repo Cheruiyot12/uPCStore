@@ -3,43 +3,70 @@
 CAUTION: Do not modify this file unless you know what you are doing.
          Unexpected results may occur if the code is changed deliberately.
 -->
-<dbmodel pgmodeler-ver="0.8.2-beta" author="Alkor" last-position="1,2" last-zoom="0.85"
+<dbmodel pgmodeler-ver="0.8.2-beta" last-position="79,0" last-zoom="0.7"
 	 default-schema="public" default-owner="postgres">
+<role name="seller"
+      inherit="true"
+      encrypted="true"
+      password="********">
+</role>
+
+<role name="alkor"
+      inherit="true"
+      login="true"
+      encrypted="true"
+      password="********">
+</role>
+
 <role name="admin"
       createdb="true"
       replication="true"
       createrole="true"
-      inherit="true">
+      inherit="true"
+      encrypted="true"
+      password="********">
+	<roles names="alkor" role-type="member" />
 </role>
 
-<role name="user">
+<role name="user"
+      inherit="true"
+      encrypted="true"
+      password="********">
+	<roles names="alkor" role-type="member" />
 </role>
 
-<role name="seller">
-</role>
-
-<database name="uPCStore">
+<database name="uPCStore" lc-ctype="Russian_Russia">
+	<role name="postgres"/>
+	<tablespace name="pg_default"/>
 </database>
 
-<schema name="public" fill-color="#e1e1e1" sql-disabled="true">
+<schema name="public" rect-visible="true" fill-color="#e1e1e1" sql-disabled="true">
 </schema>
+
+<sequence name="users_id_user_seq"
+	 start="1" increment="1"
+	 min-value="1" max-value="9223372036854775807"
+	 cache="1" cycle="false">
+	<schema name="public"/>
+	<role name="postgres"/>
+</sequence>
 
 <table name="users">
 	<schema name="public"/>
 	<role name="postgres"/>
 	<comment><![CDATA[Table contains users auth data]]></comment>
-	<position x="509.411" y="71.7647"/>
-	<column name="id_user" not-null="true">
-		<type name="bigserial"/>
+	<position x="601.429" y="118.429"/>
+	<column name="id_user" not-null="true" sequence="public.users_id_user_seq">
+		<type name="bigint"/>
 	</column>
 	<column name="login_user" not-null="true">
-		<type name="varchar" length="64"/>
+		<type name="character varying" length="64"/>
 	</column>
 	<column name="email_user" not-null="true">
-		<type name="varchar" length="64"/>
+		<type name="character varying" length="64"/>
 	</column>
 	<column name="password_user" not-null="true">
-		<type name="char" length="64"/>
+		<type name="character" length="64"/>
 	</column>
 	<column name="reg_date_user" not-null="true">
 		<type name="date"/>
@@ -54,10 +81,10 @@ CAUTION: Do not modify this file unless you know what you are doing.
 		<columns names="login_user" ref-type="src-columns"/>
 	</constraint>
 	<constraint name="chk_users_uname" type="ck-constr" table="public.users">
-			<expression><![CDATA[login_user  != '' ]]></expression>
+			<expression><![CDATA[((login_user)::text <> ''::text)]]></expression>
 	</constraint>
 	<constraint name="chk_users_email" type="ck-constr" table="public.users">
-			<expression><![CDATA[email_user  ~ '^[A-Za-z0-9._%-]+@[A-Za-z0-9.-]+[.][A-Za-z]+$']]></expression>
+			<expression><![CDATA[((email_user)::text ~ '^[A-Za-z0-9._%-]+@[A-Za-z0-9.-]+[.][A-Za-z]+$'::text)]]></expression>
 	</constraint>
 	<constraint name="uniq_email_usr" type="uq-constr" table="public.users">
 		<columns names="email_user" ref-type="src-columns"/>
@@ -66,7 +93,7 @@ CAUTION: Do not modify this file unless you know what you are doing.
 
 <index name="ind_users_uname" table="public.users"
 	 concurrent="false" unique="true" fast-update="false" buffering="false"
-	 index-type="btree" factor="0">
+	 index-type="btree" factor="90">
 		<idxelement use-sorting="false">
 			<column name="login_user"/>
 		</idxelement>
@@ -74,7 +101,7 @@ CAUTION: Do not modify this file unless you know what you are doing.
 
 <index name="und_users_email" table="public.users"
 	 concurrent="false" unique="true" fast-update="false" buffering="false"
-	 index-type="btree" factor="0">
+	 index-type="btree" factor="90">
 		<idxelement use-sorting="false">
 			<column name="email_user"/>
 		</idxelement>
@@ -82,9 +109,10 @@ CAUTION: Do not modify this file unless you know what you are doing.
 
 <table name="users_paydata">
 	<schema name="public"/>
-	<position x="907.059" y="57.6471"/>
+	<role name="postgres"/>
+	<position x="1037.86" y="103"/>
 	<column name="card_number" not-null="true">
-		<type name="char" length="16"/>
+		<type name="character" length="16"/>
 	</column>
 	<column name="card_expire_date" not-null="true">
 		<type name="date"/>
@@ -93,48 +121,53 @@ CAUTION: Do not modify this file unless you know what you are doing.
 		<type name="bigint"/>
 	</column>
 	<column name="name_owner">
-		<type name="varchar" length="64"/>
+		<type name="character varying" length="64"/>
 	</column>
 	<column name="surname_owner">
-		<type name="varchar" length="64"/>
+		<type name="character varying" length="64"/>
 	</column>
 	<column name="middlename_owner">
-		<type name="varchar" length="64"/>
+		<type name="character varying" length="64"/>
 	</column>
 	<constraint name="pk_paydata" type="pk-constr" table="public.users_paydata">
 		<columns names="card_number,card_expire_date" ref-type="src-columns"/>
 	</constraint>
 	<constraint name="chk_paydata_card_number" type="ck-constr" table="public.users_paydata">
-			<expression><![CDATA[card_number  ~ '[0-9]{13,16}']]></expression>
-	</constraint>
-	<constraint name="chk_not_empty_user" type="ck-constr" sql-disabled="true" table="public.users_paydata">
-			<expression><![CDATA[name_owner != '' AND surname_owner != '' AND middlename_owner != '']]></expression>
+			<expression><![CDATA[(card_number ~ '[0-9]{13,16}'::text)]]></expression>
 	</constraint>
 </table>
 
 <index name="ind_cardnum_carddate" table="public.users_paydata"
 	 concurrent="false" unique="true" fast-update="false" buffering="false"
-	 index-type="btree" factor="0">
+	 index-type="btree" factor="90">
 		<idxelement use-sorting="false">
 			<column name="card_number"/>
 		</idxelement>
-		<idxelement use-sorting="true" nulls-first="false" asc-order="true">
+		<idxelement use-sorting="false">
 			<column name="card_expire_date"/>
 		</idxelement>
 </index>
 
+<sequence name="items_id_item_seq"
+	 start="1" increment="1"
+	 min-value="1" max-value="9223372036854775807"
+	 cache="1" cycle="false">
+	<schema name="public"/>
+	<role name="postgres"/>
+</sequence>
+
 <table name="items">
 	<schema name="public"/>
 	<role name="postgres"/>
-	<position x="64.7059" y="395.294"/>
-	<column name="id_item" not-null="true">
-		<type name="bigserial"/>
+	<position x="265.286" y="528.571"/>
+	<column name="id_item" not-null="true" sequence="public.items_id_item_seq">
+		<type name="bigint"/>
 	</column>
 	<column name="type_id_item" not-null="true">
 		<type name="bigint"/>
 	</column>
 	<column name="name_item" not-null="true">
-		<type name="varchar" length="64"/>
+		<type name="character varying" length="64"/>
 	</column>
 	<column name="price_item_usd" not-null="true">
 		<type name="bigint"/>
@@ -146,19 +179,19 @@ CAUTION: Do not modify this file unless you know what you are doing.
 		<columns names="id_item" ref-type="src-columns"/>
 	</constraint>
 	<constraint name="chk_price" type="ck-constr" table="public.items">
-			<expression><![CDATA[price_item_usd > 0]]></expression>
+			<expression><![CDATA[(price_item_usd > 0)]]></expression>
 	</constraint>
 	<constraint name="chk_item_name" type="ck-constr" table="public.items">
-			<expression><![CDATA[name_item != '']]></expression>
+			<expression><![CDATA[((name_item)::text <> ''::text)]]></expression>
 	</constraint>
 	<constraint name="chk_count_items" type="ck-constr" table="public.items">
-			<expression><![CDATA[count_in_storage_item >= 0]]></expression>
+			<expression><![CDATA[(count_in_storage_item >= 0)]]></expression>
 	</constraint>
 </table>
 
 <index name="ind_item_id" table="public.items"
 	 concurrent="false" unique="false" fast-update="false" buffering="false"
-	 index-type="btree" factor="0">
+	 index-type="btree" factor="90">
 		<idxelement use-sorting="false">
 			<column name="id_item"/>
 		</idxelement>
@@ -166,39 +199,55 @@ CAUTION: Do not modify this file unless you know what you are doing.
 
 <index name="ind_item_type" table="public.items"
 	 concurrent="false" unique="false" fast-update="false" buffering="false"
-	 index-type="btree" factor="0">
+	 index-type="btree" factor="90">
 		<idxelement use-sorting="false">
 			<column name="type_id_item"/>
 		</idxelement>
 </index>
 
+<sequence name="item_types_id_item_type_seq"
+	 start="1" increment="1"
+	 min-value="1" max-value="9223372036854775807"
+	 cache="1" cycle="false">
+	<schema name="public"/>
+	<role name="postgres"/>
+</sequence>
+
 <table name="item_types">
 	<schema name="public"/>
 	<role name="postgres"/>
-	<position x="517.647" y="522.353"/>
-	<column name="id_item_type" not-null="true">
-		<type name="bigserial"/>
+	<position x="735.429" y="658.429"/>
+	<column name="id_item_type" not-null="true" sequence="public.item_types_id_item_type_seq">
+		<type name="bigint"/>
 	</column>
 	<column name="name_type_item" not-null="true">
-		<type name="varchar" length="64"/>
+		<type name="character varying" length="64"/>
 	</column>
 	<constraint name="pk_item_types" type="pk-constr" table="public.item_types">
 		<columns names="id_item_type" ref-type="src-columns"/>
 	</constraint>
 	<constraint name="chk_name_type" type="ck-constr" table="public.item_types">
-			<expression><![CDATA[name_type_item != '']]></expression>
+			<expression><![CDATA[((name_type_item)::text <> ''::text)]]></expression>
 	</constraint>
 </table>
+
+<sequence name="chars_id_char_seq"
+	 start="1" increment="1"
+	 min-value="1" max-value="9223372036854775807"
+	 cache="1" cycle="false">
+	<schema name="public"/>
+	<role name="postgres"/>
+</sequence>
 
 <table name="chars">
 	<schema name="public"/>
 	<role name="postgres"/>
-	<position x="947.059" y="383.529"/>
-	<column name="id_char" not-null="true">
-		<type name="bigserial"/>
+	<position x="1182.29" y="517"/>
+	<column name="id_char" not-null="true" sequence="public.chars_id_char_seq">
+		<type name="bigint"/>
 	</column>
 	<column name="name_char" not-null="true">
-		<type name="varchar" length="64"/>
+		<type name="character varying" length="64"/>
 	</column>
 	<column name="id_item_owner_type" not-null="true">
 		<type name="bigint"/>
@@ -207,14 +256,14 @@ CAUTION: Do not modify this file unless you know what you are doing.
 		<columns names="id_char" ref-type="src-columns"/>
 	</constraint>
 	<constraint name="chk_name_Char" type="ck-constr" table="public.chars">
-			<expression><![CDATA[name_char != '']]></expression>
+			<expression><![CDATA[((name_char)::text <> ''::text)]]></expression>
 	</constraint>
 </table>
 
 <table name="char_text_values">
 	<schema name="public"/>
 	<role name="postgres"/>
-	<position x="534.118" y="256.471"/>
+	<position x="724.286" y="367.629"/>
 	<column name="id_char" not-null="true">
 		<type name="bigint"/>
 	</column>
@@ -222,20 +271,20 @@ CAUTION: Do not modify this file unless you know what you are doing.
 		<type name="bigint"/>
 	</column>
 	<column name="value" not-null="true">
-		<type name="varchar" length="64"/>
+		<type name="character varying" length="64"/>
 	</column>
 	<constraint name="pk_char_text_vals" type="pk-constr" table="public.char_text_values">
 		<columns names="id_item,id_char" ref-type="src-columns"/>
 	</constraint>
 	<constraint name="chk_text_val_nnull" type="ck-constr" table="public.char_text_values">
-			<expression><![CDATA[value != '']]></expression>
+			<expression><![CDATA[((value)::text <> ''::text)]]></expression>
 	</constraint>
 </table>
 
 <index name="ind_text_vals" table="public.char_text_values"
 	 concurrent="false" unique="true" fast-update="false" buffering="false"
-	 index-type="btree" factor="0">
-		<idxelement use-sorting="true" nulls-first="false" asc-order="true">
+	 index-type="btree" factor="90">
+		<idxelement use-sorting="false">
 			<column name="id_item"/>
 		</idxelement>
 		<idxelement use-sorting="false">
@@ -243,12 +292,20 @@ CAUTION: Do not modify this file unless you know what you are doing.
 		</idxelement>
 </index>
 
+<sequence name="orders_id_order_seq"
+	 start="1" increment="1"
+	 min-value="1" max-value="9223372036854775807"
+	 cache="1" cycle="false">
+	<schema name="public"/>
+	<role name="postgres"/>
+</sequence>
+
 <table name="orders">
 	<schema name="public"/>
 	<role name="postgres"/>
-	<position x="80" y="80"/>
-	<column name="id_order" not-null="true">
-		<type name="bigserial"/>
+	<position x="313.909" y="171.343"/>
+	<column name="id_order" not-null="true" sequence="public.orders_id_order_seq">
+		<type name="bigint"/>
 	</column>
 	<column name="id_customer" not-null="true">
 		<type name="bigint"/>
@@ -257,7 +314,7 @@ CAUTION: Do not modify this file unless you know what you are doing.
 		<type name="date"/>
 	</column>
 	<column name="paid" not-null="true" default-value="true">
-		<type name="bool"/>
+		<type name="boolean"/>
 	</column>
 	<constraint name="pk_orders" type="pk-constr" table="public.orders">
 		<columns names="id_order" ref-type="src-columns"/>
@@ -267,7 +324,7 @@ CAUTION: Do not modify this file unless you know what you are doing.
 <table name="orders_items">
 	<schema name="public"/>
 	<role name="postgres"/>
-	<position x="80" y="220"/>
+	<position x="352.337" y="359.486"/>
 	<column name="id_order" not-null="true">
 		<type name="bigint"/>
 	</column>
@@ -281,14 +338,14 @@ CAUTION: Do not modify this file unless you know what you are doing.
 		<columns names="id_order,id_item" ref-type="src-columns"/>
 	</constraint>
 	<constraint name="chk_item_count" type="ck-constr" table="public.orders_items">
-			<expression><![CDATA[item_count > 0]]></expression>
+			<expression><![CDATA[(item_count > 0)]]></expression>
 	</constraint>
 </table>
 
 <table name="char_float_values">
 	<schema name="public"/>
 	<role name="postgres"/>
-	<position x="557.647" y="383.529"/>
+	<position x="758.051" y="513.343"/>
 	<column name="id_char" not-null="true">
 		<type name="bigint"/>
 	</column>
@@ -296,7 +353,7 @@ CAUTION: Do not modify this file unless you know what you are doing.
 		<type name="bigint"/>
 	</column>
 	<column name="value" not-null="true">
-		<type name="float"/>
+		<type name="double precision"/>
 	</column>
 	<constraint name="pk_float_values" type="pk-constr" table="public.char_float_values">
 		<columns names="id_char,id_item" ref-type="src-columns"/>
@@ -305,7 +362,7 @@ CAUTION: Do not modify this file unless you know what you are doing.
 
 <index name="int_float_vals" table="public.char_float_values"
 	 concurrent="false" unique="true" fast-update="false" buffering="false"
-	 index-type="btree" factor="0">
+	 index-type="btree" factor="90">
 		<idxelement use-sorting="false">
 			<column name="id_item"/>
 		</idxelement>
@@ -314,18 +371,23 @@ CAUTION: Do not modify this file unless you know what you are doing.
 		</idxelement>
 </index>
 
+<sequence name="user_groups_id_group_seq"
+	 start="1" increment="1"
+	 min-value="1" max-value="9223372036854775807"
+	 cache="1" cycle="false">
+	<schema name="public"/>
+	<role name="postgres"/>
+</sequence>
+
 <table name="user_groups">
 	<schema name="public"/>
 	<role name="postgres"/>
-	<appended-sql><![CDATA[INSERT INTO user_groups  VALUES (1, 'User', 0);
-INSERT INTO user_groups  VALUES (2, 'Seller', 50);
-INSERT INTO user_groups  VALUES (3, 'Admin', 100);]]></appended-sql>
-	<position x="903.529" y="211.765"/>
-	<column name="id_group" not-null="true">
-		<type name="bigserial"/>
+	<position x="1077.96" y="300.486"/>
+	<column name="id_group" not-null="true" sequence="public.user_groups_id_group_seq">
+		<type name="bigint"/>
 	</column>
 	<column name="name_group" not-null="true">
-		<type name="varchar" length="64"/>
+		<type name="character varying" length="64"/>
 	</column>
 	<column name="access_power" not-null="true">
 		<type name="smallint"/>
@@ -334,14 +396,14 @@ INSERT INTO user_groups  VALUES (3, 'Admin', 100);]]></appended-sql>
 		<columns names="id_group" ref-type="src-columns"/>
 	</constraint>
 	<constraint name="chk_name_group" type="ck-constr" table="public.user_groups">
-			<expression><![CDATA[name_group !='']]></expression>
+			<expression><![CDATA[((name_group)::text <> ''::text)]]></expression>
 	</constraint>
 </table>
 
 <function name="create_char"
 		window-func="false"
 		returns-setof="false"
-		behavior-type="RETURNS NULL ON NULL INPUT"
+		behavior-type="STRICT"
 		function-type="VOLATILE"
 		security-type="SECURITY INVOKER"
 		execution-cost="1"
@@ -352,20 +414,22 @@ INSERT INTO user_groups  VALUES (3, 'Admin', 100);]]></appended-sql>
 	<return-type>
 	<type name="void"/>
 	</return-type>
-	<parameter name="name" in="true">
-		<type name="varchar" length="64"/>
+	<parameter name="name">
+		<type name="character varying"/>
 	</parameter>
-	<parameter name="owner_id" in="true">
+	<parameter name="owner_id">
 		<type name="bigint"/>
 	</parameter>
-	<definition><![CDATA[INSERT INTO chars(name_char, id_item_owner_type)
-VALUES (name, owner_id);]]></definition>
+	<definition><![CDATA[
+INSERT INTO chars(name_char, id_item_owner_type)
+VALUES (name, owner_id);
+]]></definition>
 </function>
 
 <function name="create_item_type"
 		window-func="false"
 		returns-setof="false"
-		behavior-type="RETURNS NULL ON NULL INPUT"
+		behavior-type="STRICT"
 		function-type="VOLATILE"
 		security-type="SECURITY INVOKER"
 		execution-cost="1"
@@ -376,11 +440,13 @@ VALUES (name, owner_id);]]></definition>
 	<return-type>
 	<type name="void"/>
 	</return-type>
-	<parameter name="name" in="true">
-		<type name="varchar" length="64"/>
+	<parameter name="name">
+		<type name="character varying"/>
 	</parameter>
-	<definition><![CDATA[INSERT INTO item_types(name_type_item)
-VALUES (name);]]></definition>
+	<definition><![CDATA[
+INSERT INTO item_types(name_type_item)
+VALUES (name);
+]]></definition>
 </function>
 
 <function name="create_text_value"
@@ -397,17 +463,19 @@ VALUES (name);]]></definition>
 	<return-type>
 	<type name="void"/>
 	</return-type>
-	<parameter name="char_id" in="true">
+	<parameter name="char_id">
 		<type name="bigint"/>
 	</parameter>
-	<parameter name="item_id" in="true">
+	<parameter name="item_id">
 		<type name="bigint"/>
 	</parameter>
-	<parameter name="value_new" in="true">
-		<type name="varchar" length="64"/>
+	<parameter name="value_new">
+		<type name="character varying"/>
 	</parameter>
-	<definition><![CDATA[INSERT INTO char_text_value
-VALUES (char_id, item_id, value_new);]]></definition>
+	<definition><![CDATA[
+INSERT INTO char_text_value
+VALUES (char_id, item_id, value_new);
+]]></definition>
 </function>
 
 <function name="create_float_value"
@@ -424,17 +492,19 @@ VALUES (char_id, item_id, value_new);]]></definition>
 	<return-type>
 	<type name="void"/>
 	</return-type>
-	<parameter name="char_id" in="true">
+	<parameter name="char_id">
 		<type name="bigint"/>
 	</parameter>
-	<parameter name="item_id" in="true">
+	<parameter name="item_id">
 		<type name="bigint"/>
 	</parameter>
-	<parameter name="value_new" in="true">
-		<type name="float"/>
+	<parameter name="value_new">
+		<type name="double precision"/>
 	</parameter>
-	<definition><![CDATA[INSERT INTO char_float_values
-VALUES (char_id, item_id, value_new);]]></definition>
+	<definition><![CDATA[
+INSERT INTO char_float_values
+VALUES (char_id, item_id, value_new);
+]]></definition>
 </function>
 
 <function name="create_item"
@@ -451,20 +521,22 @@ VALUES (char_id, item_id, value_new);]]></definition>
 	<return-type>
 	<type name="void"/>
 	</return-type>
-	<parameter name="type" in="true">
+	<parameter name="type">
 		<type name="bigint"/>
 	</parameter>
-	<parameter name="name" in="true">
-		<type name="varchar" length="64"/>
+	<parameter name="name">
+		<type name="character varying"/>
 	</parameter>
-	<parameter name="price" in="true">
+	<parameter name="price">
 		<type name="bigint"/>
 	</parameter>
-	<parameter name="count" in="true">
+	<parameter name="count">
 		<type name="bigint"/>
 	</parameter>
-	<definition><![CDATA[INSERT INTO items(type_id_item, name_item, price_item_usd, count_in_storage_item)
-VALUES (type, name, price, count);]]></definition>
+	<definition><![CDATA[
+INSERT INTO items(type_id_item, name_item, price_item_usd, count_in_storage_item)
+VALUES (type, name, price, count);
+]]></definition>
 </function>
 
 <function name="create_order"
@@ -481,11 +553,13 @@ VALUES (type, name, price, count);]]></definition>
 	<return-type>
 	<type name="void"/>
 	</return-type>
-	<parameter name="cust_id" in="true">
+	<parameter name="cust_id">
 		<type name="bigint"/>
 	</parameter>
-	<definition><![CDATA[INSERT INTO orders(id_customer, order_date)
-VALUES(cust_id, now());]]></definition>
+	<definition><![CDATA[
+INSERT INTO orders(id_customer, order_date)
+VALUES(cust_id, now());
+]]></definition>
 </function>
 
 <function name="add_item_to_order"
@@ -502,17 +576,19 @@ VALUES(cust_id, now());]]></definition>
 	<return-type>
 	<type name="void"/>
 	</return-type>
-	<parameter name="ord_id" in="true">
+	<parameter name="ord_id">
 		<type name="bigint"/>
 	</parameter>
-	<parameter name="it_id" in="true">
+	<parameter name="it_id">
 		<type name="bigint"/>
 	</parameter>
-	<parameter name="it_count" in="true">
+	<parameter name="it_count">
 		<type name="integer"/>
 	</parameter>
-	<definition><![CDATA[INSERT INTO orders_items
-VALUES(ord_id, it_id, it_count);]]></definition>
+	<definition><![CDATA[
+INSERT INTO orders_items
+VALUES(ord_id, it_id, it_count);
+]]></definition>
 </function>
 
 <function name="create_role"
@@ -529,19 +605,21 @@ VALUES(ord_id, it_id, it_count);]]></definition>
 	<return-type>
 	<type name="void"/>
 	</return-type>
-	<parameter name="uname" in="true">
-		<type name="varchar" length="64"/>
+	<parameter name="uname">
+		<type name="character varying"/>
 	</parameter>
-	<parameter name="pword" in="true">
-		<type name="varchar" length="64"/>
+	<parameter name="pword">
+		<type name="character varying"/>
 	</parameter>
-	<parameter name="grrole" in="true">
-		<type name="varchar" length="64"/>
+	<parameter name="grrole">
+		<type name="character varying"/>
 	</parameter>
-	<definition><![CDATA[BEGIN
+	<definition><![CDATA[
+BEGIN
 EXECUTE ' CREATE USER ' || quote_ident($1) || ' PASSWORD ' || quote_literal($2) ; 
 execute 'GRANT ' || quote_ident($3) || ' TO ' || quote_ident($2) ;
-END;]]></definition>
+END;
+]]></definition>
 </function>
 
 <function name="mod_role"
@@ -558,22 +636,24 @@ END;]]></definition>
 	<return-type>
 	<type name="void"/>
 	</return-type>
-	<parameter name="roleName" in="true">
-		<type name="varchar" length="64"/>
+	<parameter name="roleName">
+		<type name="character varying"/>
 	</parameter>
-	<parameter name="groupRoleName" in="true">
-		<type name="varchar" length="64"/>
+	<parameter name="groupRoleName">
+		<type name="character varying"/>
 	</parameter>
-	<parameter name="ifrevoke" in="true">
-		<type name="bool"/>
+	<parameter name="ifrevoke">
+		<type name="boolean"/>
 	</parameter>
-	<definition><![CDATA[BEGIN
+	<definition><![CDATA[
+BEGIN
 IF NOT ifrevoke THEN
 	EXECUTE 'GRANT ' || quote_ident($2) || ' TO ' || quote_ident($1);
 ELSE
 	EXECUTE 'REVOKE ' || quote_ident($2) || ' FROM ' || quote_ident($1);
 END IF;
-END;]]></definition>
+END;
+]]></definition>
 </function>
 
 <function name="create_user"
@@ -590,34 +670,36 @@ END;]]></definition>
 	<return-type>
 	<type name="void"/>
 	</return-type>
-	<parameter name="ulog" in="true">
-		<type name="varchar" length="64"/>
+	<parameter name="ulog">
+		<type name="character varying"/>
 	</parameter>
-	<parameter name="upass" in="true">
-		<type name="varchar" length="64"/>
+	<parameter name="upass">
+		<type name="character varying"/>
 	</parameter>
-	<parameter name="umail" in="true">
-		<type name="varchar" length="64"/>
+	<parameter name="umail">
+		<type name="character varying"/>
 	</parameter>
-	<parameter name="cardnum" in="true">
-		<type name="varchar" length="16"/>
+	<parameter name="cardnum">
+		<type name="character varying"/>
 	</parameter>
-	<parameter name="date" in="true">
-		<type name="varchar" length="64"/>
+	<parameter name="date">
+		<type name="character varying"/>
 	</parameter>
-	<parameter name="uname" in="true">
-		<type name="varchar" length="64"/>
+	<parameter name="uname">
+		<type name="character varying"/>
 	</parameter>
-	<parameter name="usur" in="true">
-		<type name="varchar" length="64"/>
+	<parameter name="usur">
+		<type name="character varying"/>
 	</parameter>
-	<parameter name="umid" in="true">
-		<type name="varchar" length="64"/>
+	<parameter name="umid">
+		<type name="character varying"/>
 	</parameter>
-	<definition><![CDATA[BEGIN
+	<definition><![CDATA[
+BEGIN
 EXECUTE ' INSERT INTO users(login_user, email_user, password_user, reg_date_user, group_user) VALUES (''' || $1 || ''', ''' || $3 || ''', ''' || $2 || ''', ''' || now() || ''', ' || 1 || ')';
 EXECUTE ' INSERT INTO users_paydata VALUES( ' || quote_literal($4) || ', ' || quote_literal(date) || ', (SELECT id_user FROM users WHERE login_user = ' || quote_literal($1) || '), ' || quote_literal(uname) || ', ' || quote_literal(usur) || ', ' || quote_literal(umid) || ')';
-END;]]></definition>
+END;
+]]></definition>
 </function>
 
 <function name="mod_user"
@@ -634,16 +716,18 @@ END;]]></definition>
 	<return-type>
 	<type name="void"/>
 	</return-type>
-	<parameter name="id" in="true">
+	<parameter name="id">
 		<type name="bigint"/>
 	</parameter>
-	<parameter name="email" in="true">
-		<type name="varchar" length="64"/>
+	<parameter name="email">
+		<type name="character varying"/>
 	</parameter>
-	<parameter name="pass" in="true">
-		<type name="char" length="64"/>
+	<parameter name="pass">
+		<type name="character"/>
 	</parameter>
-	<definition><![CDATA[UPDATE users SET email_user = email, password_user = pass WHERE id_user = id;]]></definition>
+	<definition><![CDATA[
+UPDATE users SET email_user = email, password_user = pass WHERE id_user = id;
+]]></definition>
 </function>
 
 <function name="mod_item"
@@ -660,22 +744,24 @@ END;]]></definition>
 	<return-type>
 	<type name="smallint"/>
 	</return-type>
-	<parameter name="id" in="true">
+	<parameter name="id">
 		<type name="bigint"/>
 	</parameter>
-	<parameter name="typ" in="true">
+	<parameter name="typ">
 		<type name="bigint"/>
 	</parameter>
-	<parameter name="nam" in="true">
-		<type name="varchar" length="64"/>
+	<parameter name="nam">
+		<type name="character varying"/>
 	</parameter>
-	<parameter name="price" in="true">
+	<parameter name="price">
 		<type name="smallint"/>
 	</parameter>
-	<parameter name="count" in="true">
+	<parameter name="count">
 		<type name="bigint"/>
 	</parameter>
-	<definition><![CDATA[UPDATE items SET type_id_item = typ, name_item = nam, price_item_usd = price, count _in_storage_item = count WHERE id_item = id;]]></definition>
+	<definition><![CDATA[
+UPDATE items SET type_id_item = typ, name_item = nam, price_item_usd = price, count _in_storage_item = count WHERE id_item = id;
+]]></definition>
 </function>
 
 <function name="mod_item_type"
@@ -692,13 +778,15 @@ END;]]></definition>
 	<return-type>
 	<type name="void"/>
 	</return-type>
-	<parameter name="id" in="true">
+	<parameter name="id">
 		<type name="bigint"/>
 	</parameter>
-	<parameter name="name_type" in="true">
-		<type name="varchar" length="64"/>
+	<parameter name="name_type">
+		<type name="character varying"/>
 	</parameter>
-	<definition><![CDATA[UPDATE item_types SET name_type_item = name_type WHERE id_item_type = id;]]></definition>
+	<definition><![CDATA[
+UPDATE item_types SET name_type_item = name_type WHERE id_item_type = id;
+]]></definition>
 </function>
 
 <function name="mod_char"
@@ -715,16 +803,18 @@ END;]]></definition>
 	<return-type>
 	<type name="void"/>
 	</return-type>
-	<parameter name="id" in="true">
+	<parameter name="id">
 		<type name="bigint"/>
 	</parameter>
-	<parameter name="namec" in="true">
-		<type name="varchar" length="64"/>
+	<parameter name="namec">
+		<type name="character varying"/>
 	</parameter>
-	<parameter name="ownid" in="true">
+	<parameter name="ownid">
 		<type name="bigint"/>
 	</parameter>
-	<definition><![CDATA[UPDATE chars SET name_char = namec, id_item_owner_type = ownid WHERE id_char = id;]]></definition>
+	<definition><![CDATA[
+UPDATE chars SET name_char = namec, id_item_owner_type = ownid WHERE id_char = id;
+]]></definition>
 </function>
 
 <function name="mod_text"
@@ -741,16 +831,18 @@ END;]]></definition>
 	<return-type>
 	<type name="void"/>
 	</return-type>
-	<parameter name="idc" in="true">
+	<parameter name="idc">
 		<type name="bigint"/>
 	</parameter>
-	<parameter name="idi" in="true">
+	<parameter name="idi">
 		<type name="bigint"/>
 	</parameter>
-	<parameter name="val" in="true">
-		<type name="varchar" length="64"/>
+	<parameter name="val">
+		<type name="character varying"/>
 	</parameter>
-	<definition><![CDATA[UPDATE char_text_values SET value = val  WHERE id_char = idc AND id_item = idi;]]></definition>
+	<definition><![CDATA[
+UPDATE char_text_values SET value = val  WHERE id_char = idc AND id_item = idi;
+]]></definition>
 </function>
 
 <function name="mod_float"
@@ -767,17 +859,45 @@ END;]]></definition>
 	<return-type>
 	<type name="void"/>
 	</return-type>
-	<parameter name="idc" in="true">
+	<parameter name="idc">
 		<type name="bigint"/>
 	</parameter>
-	<parameter name="idi" in="true">
+	<parameter name="idi">
 		<type name="bigint"/>
 	</parameter>
-	<parameter name="val" in="true">
-		<type name="float"/>
+	<parameter name="val">
+		<type name="double precision"/>
 	</parameter>
-	<definition><![CDATA[UPDATE char_text_values SET value = val  WHERE id_char = idc AND id_item = idi;]]></definition>
+	<definition><![CDATA[
+UPDATE char_text_values SET value = val  WHERE id_char = idc AND id_item = idi;
+]]></definition>
 </function>
+
+<view name="text_chars">
+	<schema name="public"/>
+	<role name="postgres"/>
+	<position x="342.857" y="706.543"/>
+	<reference>
+		<expression><![CDATA[ SELECT chars.id_char,
+    chars.name_char,
+    char_text_values.value
+   FROM (char_text_values
+     JOIN chars ON ((char_text_values.id_char = chars.id_char)));]]></expression>
+	</reference>
+</view>
+
+<view name="float_chars">
+	<schema name="public"/>
+	<role name="postgres"/>
+	<position x="531.429" y="707.143"/>
+	<reference>
+		<expression><![CDATA[ SELECT chars.id_char,
+    chars.name_char,
+    char_float_values.value
+   FROM (char_float_values
+     JOIN chars ON ((char_float_values.id_char = chars.id_char)));]]></expression>
+	</reference>
+</view>
 
 <constraint name="fk_users_groups" type="fk-constr" comparison-type="MATCH FULL"
 	 upd-action="CASCADE" del-action="RESTRICT" ref-table="public.user_groups" table="public.users">
@@ -845,95 +965,122 @@ END;]]></definition>
 	<columns names="id_char" ref-type="dst-columns"/>
 </constraint>
 
+<relationship name="rel_users_user_groups" type="relfk"
+	 custom-color="#83af1f"
+	 src-table="public.users"
+	 dst-table="public.user_groups"
+	 src-required="false" dst-required="false"/>
+
 <relationship name="rel_users_paydata_users" type="relfk"
+	 custom-color="#5aa578"
 	 src-table="public.users_paydata"
 	 dst-table="public.users"
 	 src-required="false" dst-required="false"/>
 
 <relationship name="rel_items_item_types" type="relfk"
+	 custom-color="#4b3e56"
 	 src-table="public.items"
 	 dst-table="public.item_types"
 	 src-required="false" dst-required="false"/>
 
-<relationship name="rel_characterisitcs_item_types" type="relfk"
+<relationship name="rel_chars_item_types" type="relfk"
+	 custom-color="#9ac721"
 	 src-table="public.chars"
 	 dst-table="public.item_types"
-	 src-required="false" dst-required="false">
-	<label ref-type="name-label">
-		<position x="-59.8743" y="1.55147"/>
-	</label>
-</relationship>
+	 src-required="false" dst-required="false"/>
 
 <relationship name="rel_char_text_values_items" type="relfk"
+	 custom-color="#249b49"
 	 src-table="public.char_text_values"
 	 dst-table="public.items"
-	 src-required="false" dst-required="false">
-	<label ref-type="name-label">
-		<position x="0" y="0"/>
-	</label>
-</relationship>
+	 src-required="false" dst-required="false"/>
 
-<relationship name="rel_char_text_values_characterisitcs" type="relfk"
+<relationship name="rel_char_text_values_chars" type="relfk"
+	 custom-color="#942665"
 	 src-table="public.char_text_values"
 	 dst-table="public.chars"
 	 src-required="false" dst-required="false"/>
 
 <relationship name="rel_orders_users" type="relfk"
+	 custom-color="#abb258"
 	 src-table="public.orders"
 	 dst-table="public.users"
-	 src-required="false" dst-required="false">
-	<label ref-type="src-label">
-		<position x="0" y="0"/>
-	</label>
-</relationship>
+	 src-required="false" dst-required="false"/>
 
 <relationship name="rel_orders_items_orders" type="relfk"
+	 custom-color="#94e1e5"
 	 src-table="public.orders_items"
 	 dst-table="public.orders"
 	 src-required="false" dst-required="false"/>
 
 <relationship name="rel_orders_items_items" type="relfk"
+	 custom-color="#a239f5"
 	 src-table="public.orders_items"
 	 dst-table="public.items"
 	 src-required="false" dst-required="false"/>
 
 <relationship name="rel_char_float_values_items" type="relfk"
+	 custom-color="#4e132e"
 	 src-table="public.char_float_values"
 	 dst-table="public.items"
 	 src-required="false" dst-required="false"/>
 
-<relationship name="rel_char_float_values_characterisitcs" type="relfk"
+<relationship name="rel_char_float_values_chars" type="relfk"
+	 custom-color="#081cb1"
 	 src-table="public.char_float_values"
 	 dst-table="public.chars"
-	 src-required="false" dst-required="false">
-	<label ref-type="name-label">
-		<position x="0" y="0"/>
-	</label>
-</relationship>
-
-<relationship name="rel_users_user_groups" type="relfk"
-	 src-table="public.users"
-	 dst-table="public.user_groups"
 	 src-required="false" dst-required="false"/>
 
+<permission>
+	<object name="public.users" type="table"/>
+	<roles names="postgres"/>
+	<privileges select="true" delete="true" insert="true" update="true" truncate="true" references="true" trigger="true"/>
+</permission>
 <permission>
 	<object name="public.users" type="table"/>
 	<roles names="admin"/>
 	<privileges select="true"/>
 </permission>
 <permission>
-	<object name="public.mod_role(IN varchar(64),IN varchar(64),IN bool)" type="function"/>
-	<roles names="admin"/>
+	<object name="public.add_item_to_order(bigint,bigint,integer)" type="function"/>
 	<privileges execute="true"/>
 </permission>
 <permission>
-	<object name="public.create_role(IN varchar(64),IN varchar(64),IN varchar(64))" type="function"/>
-	<roles names="admin"/>
+	<object name="public.add_item_to_order(bigint,bigint,integer)" type="function"/>
+	<roles names="postgres"/>
 	<privileges execute="true"/>
 </permission>
 <permission>
-	<object name="public.add_item_to_order(IN bigint,IN bigint,IN integer)" type="function"/>
+	<object name="public.add_item_to_order(bigint,bigint,integer)" type="function"/>
 	<roles names="&quot;user&quot;"/>
+	<privileges execute="true"/>
+</permission>
+<permission>
+	<object name="public.create_role(character varying,character varying,character varying)" type="function"/>
+	<privileges execute="true"/>
+</permission>
+<permission>
+	<object name="public.create_role(character varying,character varying,character varying)" type="function"/>
+	<roles names="postgres"/>
+	<privileges execute="true"/>
+</permission>
+<permission>
+	<object name="public.create_role(character varying,character varying,character varying)" type="function"/>
+	<roles names="admin"/>
+	<privileges execute="true"/>
+</permission>
+<permission>
+	<object name="public.mod_role(character varying,character varying,boolean)" type="function"/>
+	<privileges execute="true"/>
+</permission>
+<permission>
+	<object name="public.mod_role(character varying,character varying,boolean)" type="function"/>
+	<roles names="postgres"/>
+	<privileges execute="true"/>
+</permission>
+<permission>
+	<object name="public.mod_role(character varying,character varying,boolean)" type="function"/>
+	<roles names="admin"/>
 	<privileges execute="true"/>
 </permission>
 </dbmodel>
