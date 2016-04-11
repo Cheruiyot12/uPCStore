@@ -3,7 +3,7 @@
 CAUTION: Do not modify this file unless you know what you are doing.
          Unexpected results may occur if the code is changed deliberately.
 -->
-<dbmodel pgmodeler-ver="0.8.2-beta" author="Alkor" last-position="100,162" last-zoom="0.85"
+<dbmodel pgmodeler-ver="0.8.2-beta" author="Alkor" last-position="0,0" last-zoom="0.85"
 	 default-schema="public" default-owner="postgres">
 <role name="admin"
       createdb="true"
@@ -190,10 +190,10 @@ CAUTION: Do not modify this file unless you know what you are doing.
 	</constraint>
 </table>
 
-<table name="characterisitcs">
+<table name="chars">
 	<schema name="public"/>
 	<role name="postgres"/>
-	<position x="903.529" y="382.353"/>
+	<position x="942.353" y="383.529"/>
 	<column name="id_char" not-null="true">
 		<type name="bigserial"/>
 	</column>
@@ -203,10 +203,10 @@ CAUTION: Do not modify this file unless you know what you are doing.
 	<column name="id_item_owner_type" not-null="true">
 		<type name="bigint"/>
 	</column>
-	<constraint name="pk_characteristics" type="pk-constr" table="public.characterisitcs">
+	<constraint name="pk_characteristics" type="pk-constr" table="public.chars">
 		<columns names="id_char" ref-type="src-columns"/>
 	</constraint>
-	<constraint name="chk_name_Char" type="ck-constr" table="public.characterisitcs">
+	<constraint name="chk_name_Char" type="ck-constr" table="public.chars">
 			<expression><![CDATA[name_char != '']]></expression>
 	</constraint>
 </table>
@@ -358,7 +358,7 @@ INSERT INTO user_groups  VALUES (3, 'Admin', 100);]]></appended-sql>
 	<parameter name="owner_id" in="true">
 		<type name="bigint"/>
 	</parameter>
-	<definition><![CDATA[INSERT INTO characteristics(name_char, id_item_owner_type)
+	<definition><![CDATA[INSERT INTO chars(name_char, id_item_owner_type)
 VALUES (name, owner_id);]]></definition>
 </function>
 
@@ -620,6 +620,165 @@ EXECUTE ' INSERT INTO users_paydata VALUES( ' || quote_literal($4) || ', ' || qu
 END;]]></definition>
 </function>
 
+<function name="mod_user"
+		window-func="false"
+		returns-setof="false"
+		behavior-type="CALLED ON NULL INPUT"
+		function-type="VOLATILE"
+		security-type="SECURITY INVOKER"
+		execution-cost="1"
+		row-amount="0">
+	<schema name="public"/>
+	<role name="postgres"/>
+	<language name="sql" sql-disabled="true"/>
+	<return-type>
+	<type name="void"/>
+	</return-type>
+	<parameter name="id" in="true">
+		<type name="bigint"/>
+	</parameter>
+	<parameter name="email" in="true">
+		<type name="varchar" length="64"/>
+	</parameter>
+	<parameter name="pass" in="true">
+		<type name="char" length="64"/>
+	</parameter>
+	<definition><![CDATA[UPDATE users SET email_user = email, password_user = pass WHERE id_user = id;]]></definition>
+</function>
+
+<function name="mod_item"
+		window-func="false"
+		returns-setof="false"
+		behavior-type="CALLED ON NULL INPUT"
+		function-type="VOLATILE"
+		security-type="SECURITY INVOKER"
+		execution-cost="1"
+		row-amount="0">
+	<schema name="public"/>
+	<role name="postgres"/>
+	<language name="sql" sql-disabled="true"/>
+	<return-type>
+	<type name="smallint"/>
+	</return-type>
+	<parameter name="id" in="true">
+		<type name="bigint"/>
+	</parameter>
+	<parameter name="typ" in="true">
+		<type name="bigint"/>
+	</parameter>
+	<parameter name="nam" in="true">
+		<type name="varchar" length="64"/>
+	</parameter>
+	<parameter name="price" in="true">
+		<type name="smallint"/>
+	</parameter>
+	<parameter name="count" in="true">
+		<type name="bigint"/>
+	</parameter>
+	<definition><![CDATA[UPDATE items SET type_id_item = typ, name_item = nam, price_item_usd = price, count _in_storage_item = count WHERE id_item = id;]]></definition>
+</function>
+
+<function name="mod_item_type"
+		window-func="false"
+		returns-setof="false"
+		behavior-type="CALLED ON NULL INPUT"
+		function-type="VOLATILE"
+		security-type="SECURITY INVOKER"
+		execution-cost="1"
+		row-amount="0">
+	<schema name="public"/>
+	<role name="postgres"/>
+	<language name="sql" sql-disabled="true"/>
+	<return-type>
+	<type name="void"/>
+	</return-type>
+	<parameter name="id" in="true">
+		<type name="bigint"/>
+	</parameter>
+	<parameter name="name_type" in="true">
+		<type name="varchar" length="64"/>
+	</parameter>
+	<definition><![CDATA[UPDATE item_types SET name_type_item = name_type WHERE id_item_type = id;]]></definition>
+</function>
+
+<function name="mod_char"
+		window-func="false"
+		returns-setof="false"
+		behavior-type="CALLED ON NULL INPUT"
+		function-type="VOLATILE"
+		security-type="SECURITY INVOKER"
+		execution-cost="1"
+		row-amount="0">
+	<schema name="public"/>
+	<role name="postgres"/>
+	<language name="sql" sql-disabled="true"/>
+	<return-type>
+	<type name="void"/>
+	</return-type>
+	<parameter name="id" in="true">
+		<type name="bigint"/>
+	</parameter>
+	<parameter name="namec" in="true">
+		<type name="varchar" length="64"/>
+	</parameter>
+	<parameter name="ownid" in="true">
+		<type name="bigint"/>
+	</parameter>
+	<definition><![CDATA[UPDATE chars SET name_char = namec, id_item_owner_type = ownid WHERE id_char = id;]]></definition>
+</function>
+
+<function name="mod_text"
+		window-func="false"
+		returns-setof="false"
+		behavior-type="CALLED ON NULL INPUT"
+		function-type="VOLATILE"
+		security-type="SECURITY INVOKER"
+		execution-cost="1"
+		row-amount="0">
+	<schema name="public"/>
+	<role name="postgres"/>
+	<language name="sql" sql-disabled="true"/>
+	<return-type>
+	<type name="void"/>
+	</return-type>
+	<parameter name="idc" in="true">
+		<type name="bigint"/>
+	</parameter>
+	<parameter name="idi" in="true">
+		<type name="bigint"/>
+	</parameter>
+	<parameter name="val" in="true">
+		<type name="varchar" length="64"/>
+	</parameter>
+	<definition><![CDATA[UPDATE char_text_values SET value = val  WHERE id_char = idc AND id_item = idi;]]></definition>
+</function>
+
+<function name="mod_float"
+		window-func="false"
+		returns-setof="false"
+		behavior-type="CALLED ON NULL INPUT"
+		function-type="VOLATILE"
+		security-type="SECURITY INVOKER"
+		execution-cost="1"
+		row-amount="0">
+	<schema name="public"/>
+	<role name="postgres"/>
+	<language name="sql" sql-disabled="true"/>
+	<return-type>
+	<type name="void"/>
+	</return-type>
+	<parameter name="idc" in="true">
+		<type name="bigint"/>
+	</parameter>
+	<parameter name="idi" in="true">
+		<type name="bigint"/>
+	</parameter>
+	<parameter name="val" in="true">
+		<type name="float"/>
+	</parameter>
+	<definition><![CDATA[UPDATE char_text_values SET value = val  WHERE id_char = idc AND id_item = idi;]]></definition>
+</function>
+
 <constraint name="fk_users_groups" type="fk-constr" comparison-type="MATCH FULL"
 	 upd-action="CASCADE" del-action="RESTRICT" ref-table="public.user_groups" table="public.users">
 	<columns names="group_user" ref-type="src-columns"/>
@@ -639,7 +798,7 @@ END;]]></definition>
 </constraint>
 
 <constraint name="fk_characteristics_itemtype" type="fk-constr" comparison-type="MATCH FULL"
-	 upd-action="CASCADE" del-action="RESTRICT" ref-table="public.item_types" table="public.characterisitcs">
+	 upd-action="CASCADE" del-action="RESTRICT" ref-table="public.item_types" table="public.chars">
 	<columns names="id_item_owner_type" ref-type="src-columns"/>
 	<columns names="id_item_type" ref-type="dst-columns"/>
 </constraint>
@@ -651,7 +810,7 @@ END;]]></definition>
 </constraint>
 
 <constraint name="fk_textvals_2" type="fk-constr" comparison-type="MATCH FULL"
-	 upd-action="CASCADE" del-action="RESTRICT" ref-table="public.characterisitcs" table="public.char_text_values">
+	 upd-action="CASCADE" del-action="RESTRICT" ref-table="public.chars" table="public.char_text_values">
 	<columns names="id_char" ref-type="src-columns"/>
 	<columns names="id_char" ref-type="dst-columns"/>
 </constraint>
@@ -681,7 +840,7 @@ END;]]></definition>
 </constraint>
 
 <constraint name="fk_chars_float" type="fk-constr" comparison-type="MATCH FULL"
-	 upd-action="CASCADE" del-action="RESTRICT" ref-table="public.characterisitcs" table="public.char_float_values">
+	 upd-action="CASCADE" del-action="RESTRICT" ref-table="public.chars" table="public.char_float_values">
 	<columns names="id_char" ref-type="src-columns"/>
 	<columns names="id_char" ref-type="dst-columns"/>
 </constraint>
@@ -697,7 +856,7 @@ END;]]></definition>
 	 src-required="false" dst-required="false"/>
 
 <relationship name="rel_characterisitcs_item_types" type="relfk"
-	 src-table="public.characterisitcs"
+	 src-table="public.chars"
 	 dst-table="public.item_types"
 	 src-required="false" dst-required="false">
 	<label ref-type="name-label">
@@ -716,7 +875,7 @@ END;]]></definition>
 
 <relationship name="rel_char_text_values_characterisitcs" type="relfk"
 	 src-table="public.char_text_values"
-	 dst-table="public.characterisitcs"
+	 dst-table="public.chars"
 	 src-required="false" dst-required="false"/>
 
 <relationship name="rel_orders_users" type="relfk"
@@ -745,7 +904,7 @@ END;]]></definition>
 
 <relationship name="rel_char_float_values_characterisitcs" type="relfk"
 	 src-table="public.char_float_values"
-	 dst-table="public.characterisitcs"
+	 dst-table="public.chars"
 	 src-required="false" dst-required="false">
 	<label ref-type="name-label">
 		<position x="0" y="0"/>
@@ -770,6 +929,11 @@ END;]]></definition>
 <permission>
 	<object name="public.create_role(IN varchar(64),IN varchar(64),IN varchar(64))" type="function"/>
 	<roles names="admin"/>
+	<privileges execute="true"/>
+</permission>
+<permission>
+	<object name="public.add_item_to_order(IN bigint,IN bigint,IN integer)" type="function"/>
+	<roles names="&quot;user&quot;"/>
 	<privileges execute="true"/>
 </permission>
 </dbmodel>
