@@ -4,7 +4,7 @@
 #
 #-------------------------------------------------
 
-QT       += core gui
+QT       += core gui network sql websockets
 
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 
@@ -13,6 +13,13 @@ TEMPLATE = app
 
 
 SOURCES += main.cpp\
-        mainwindow.cpp
+        mainwindow.cpp \
+    core.cpp \
+    client.cpp \
+    clientdatabase.cpp
 
-HEADERS  += mainwindow.h
+HEADERS  += mainwindow.h \
+    core.h \
+    client.h \
+    clientdatabase.h \
+    commands.h

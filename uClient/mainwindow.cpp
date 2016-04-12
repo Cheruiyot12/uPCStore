@@ -9,3 +9,8 @@ MainWindow::~MainWindow()
 {
 
 }
+
+void MainWindow::showErr(QString text)
+{
+    QMessageBox::warning(this, "eRRoR", text);
+}
