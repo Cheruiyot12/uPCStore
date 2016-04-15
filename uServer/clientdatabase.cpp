@@ -29,3 +29,24 @@ bool ClientDatabase::auth(QString log, QString pass)
         qDebug() << query.lastError().databaseText();
     }
 }
+
+QString ClientDatabase::getGroups()
+{
+    QSqlQuery query;
+    QJsonArray grArr;
+    query.prepare("SELECT * FROM item_types");
+    if(query.exec()){
+        while (query.next()){
+            QJsonObject grp;
+            grp["groupId"] = query.value(0).toInt();
+            grp["groupName"] = query.value(1).toString();
+            grArr.append(grp);
+        }
+        QJsonDocument doc(grArr);
+        return doc.toJson(QJsonDocument::Compact);
+    } else {
+        qDebug() << "failed on getGroups";
+        qDebug() << query.lastError().databaseText();
+        return "NULL";
+    }
+}

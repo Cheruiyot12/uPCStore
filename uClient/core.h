@@ -5,6 +5,7 @@
 #include <mainwindow.h>
 #include <loginwidget.h>
 #include <connector.h>
+#include <itemgroup.h>
 #include <QJsonObject>
 #include <QJsonDocument>
 
@@ -22,10 +23,14 @@ public slots:
     void logIn(QString log, QString pass);
     void onSucessLogin();
     void errorHandler(int code);
+
+    void onNewGroup(QJsonObject json);
+    void groupsToBox();
 private:
     MainWindow* mw;
     LoginWidget* lw;
     Connector* con;
+    QList<ItemGroup*> groupList;
 
 };
 

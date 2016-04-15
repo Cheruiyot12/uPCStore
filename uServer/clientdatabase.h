@@ -24,6 +24,7 @@ signals:
 public slots:
     bool loginToDb(QString log, QString pass);
     bool auth(QString log, QString pass);
+    QString getGroups();
 private:
     QSqlDatabase mainDB;
 

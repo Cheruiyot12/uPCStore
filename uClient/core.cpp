@@ -15,6 +15,7 @@ void Core::showInterface()
     connect(lw, SIGNAL(loginSig(QString,QString)), this, SLOT(logIn(QString,QString)));
     connect(con, SIGNAL(onSuccessLogin()), this, SLOT(onSucessLogin()));
     connect(con, SIGNAL(onErr(int)), this ,SLOT(errorHandler(int)));
+    connect(con, SIGNAL(onNewGroup(QJsonObject)), this, SLOT(onNewGroup(QJsonObject)));
     lw->show();
 }
 
@@ -34,6 +35,13 @@ void Core::onSucessLogin()
 {
     mw->show();
     lw->close();
+
+
+    QJsonObject uData;
+    uData["command"] = getItemGroups;
+
+    QJsonDocument uDoc(uData);
+    con->sendTextMess(uDoc.toJson(QJsonDocument::Compact));
 }
 
 void Core::errorHandler(int code)
@@ -47,3 +55,18 @@ void Core::errorHandler(int code)
     }
 }
 
+void Core::onNewGroup(QJsonObject json)
+{
+    ItemGroup* newGroup = new ItemGroup();
+    newGroup->fromJson(&json);
+    groupList.append(newGroup);
+    groupsToBox();
+}
+
+void Core::groupsToBox()
+{
+    mw->clearGroups();
+    for(int i = 0; i < groupList.size(); i++){
+        mw->onNewGroup(groupList.at(i)->getName());
+    }
+}

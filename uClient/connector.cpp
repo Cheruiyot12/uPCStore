@@ -43,6 +43,17 @@ void Connector::onTextMsg(QString msg)
     {
         emit this->onErr(obj["eRRoRcode"].toInt());
     }
+    case getItemGroups:
+    {
+        QJsonDocument grDoc;
+        grDoc = QJsonDocument::fromJson(obj["groupArr"].toString().toUtf8());
+        QJsonArray grArr = grDoc.array();
+        for (int i = 0; i < grArr.size(); i++){
+            //qDebug() << grArr.at(i).toObject().value("groupName").toString();
+            emit this->onNewGroup(grArr.at(i).toObject());
+        }
+
+    }
     default:
         break;
     }

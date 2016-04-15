@@ -16,6 +16,7 @@ public:
 signals:
     void onSuccessLogin();
     void onErr(int);
+    void onNewGroup(QJsonObject obj);
 
 public slots:
     void connect2server(QUrl url);

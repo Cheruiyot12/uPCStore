@@ -38,6 +38,16 @@ void Client::onTextMessage(QString msg)
         }
         break;
     }
+    case getItemGroups:
+    {
+        QString grpStr = dataBase->getGroups();
+        QJsonObject grps;
+        grps["command"] = getItemGroups;
+        grps["groupArr"] = grpStr;
+        QJsonDocument gr2send(grps);
+
+        this->sendTextMes(gr2send.toJson(QJsonDocument::Compact));
+    }
     default:
         break;
     }

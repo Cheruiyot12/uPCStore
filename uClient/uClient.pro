@@ -16,9 +16,11 @@ SOURCES += main.cpp\
         mainwindow.cpp \
     connector.cpp \
     core.cpp \
-    loginwidget.cpp
+    loginwidget.cpp \
+    itemgroup.cpp
 
 HEADERS  += mainwindow.h \
     connector.h \
     core.h \
-    loginwidget.h
+    loginwidget.h \
+    itemgroup.h
