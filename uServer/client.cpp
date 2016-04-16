@@ -2,8 +2,8 @@
 
 Client::Client(QWebSocket* sock, QObject *parent) : QObject(parent), mainSocket(sock), dataBase(new ClientDatabase())
 {
-   connect(mainSocket, SIGNAL(textMessageReceived(QString)), this, SLOT(onTextMessage(QString)));
-   connect(mainSocket, SIGNAL(disconnected()), this, SLOT(onDisconnect()));
+    connect(mainSocket, SIGNAL(textMessageReceived(QString)), this, SLOT(onTextMessage(QString)));
+    connect(mainSocket, SIGNAL(disconnected()), this, SLOT(onDisconnect()));
 }
 
 void Client::onTextMessage(QString msg)
@@ -40,13 +40,58 @@ void Client::onTextMessage(QString msg)
     }
     case getItemGroups:
     {
-        QString grpStr = dataBase->getGroups();
-        QJsonObject grps;
-        grps["command"] = getItemGroups;
-        grps["groupArr"] = grpStr;
-        QJsonDocument gr2send(grps);
+        result res = dataBase->getGroups();
+        if(!res.isError){
+            QJsonObject grps;
+            grps["command"] = getItemGroups;
+            grps["groupArr"] = res.resStr;
+            QJsonDocument gr2send(grps);
 
-        this->sendTextMes(gr2send.toJson(QJsonDocument::Compact));
+
+            this->sendTextMes(gr2send.toJson(QJsonDocument::Compact));
+        } else {
+            QJsonObject uData;
+            uData["command"] = error;
+            switch (res.errorCode) {
+            case 42501:
+            {
+                uData["eRRoRcode"] = nopermisssions;
+                break;
+            }
+            default:
+                break;
+            }
+            QJsonDocument uDoc(uData);
+            this->sendTextMes(uDoc.toJson(QJsonDocument::Compact));
+        }
+        break;
+    }
+    case getItemsFromGroup:
+    {
+        result res = dataBase->getItemsFromGroup(obj["groupId"].toInt());
+        if(!res.isError){
+            QJsonObject itms;
+            itms["command"] = getItemsFromGroup;
+            itms["itmsArr"]= res.resStr;
+            QJsonDocument itm2send(itms);
+
+            this->sendTextMes(itm2send.toJson(QJsonDocument::Compact));
+        } else {
+            QJsonObject uData;
+            uData["command"] = error;
+            switch (res.errorCode) {
+            case 42501:
+            {
+                uData["eRRoRcode"] = nopermisssions;
+                break;
+            }
+            default:
+                break;
+            }
+            QJsonDocument uDoc(uData);
+            this->sendTextMes(uDoc.toJson(QJsonDocument::Compact));
+        }
+        break;
     }
     default:
         break;

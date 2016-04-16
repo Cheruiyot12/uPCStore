@@ -13,6 +13,12 @@
 #include <QDebug>
 #include <QDataStream>
 
+struct result{
+    bool isError = false;
+    int errorCode = 0;
+    QString resStr = "";
+};
+
 class ClientDatabase : public QObject
 {
     Q_OBJECT
@@ -24,7 +30,8 @@ signals:
 public slots:
     bool loginToDb(QString log, QString pass);
     bool auth(QString log, QString pass);
-    QString getGroups();
+    result getGroups();
+    result getItemsFromGroup(int grId);
 private:
     QSqlDatabase mainDB;
 

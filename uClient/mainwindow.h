@@ -27,11 +27,21 @@ public:
     ~MainWindow();
 public slots:
     void showErr(QString text);
+
     void onNewGroup(QString name);
     void clearGroups();
+
+    void onNewItem(QString name);
+    void clearItems();
 private:
     QComboBox* catBox;
     QListWidget* mainList;
+private slots:
+    void onGroupIndexChanged(int ind);
+    void onItemRowChanged(int row);
+signals:
+    void currentGroupChangedSig(int id);
+    void currenrItemChangedSig(int id);
 };
 
 #endif // MAINWINDOW_H

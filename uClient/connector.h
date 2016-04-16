@@ -16,8 +16,14 @@ public:
 signals:
     void onSuccessLogin();
     void onErr(int);
-    void onNewGroup(QJsonObject obj);
 
+    void onNewGroup(QJsonObject obj);
+    void groupsToWidget();
+    void clearGr();
+
+    void onNewItem(QJsonObject obj);
+    void itemsToList();
+    void clearItms();
 public slots:
     void connect2server(QUrl url);
     void sendTextMess(QString msg);

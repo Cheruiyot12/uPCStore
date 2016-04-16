@@ -19,7 +19,7 @@ bool ClientDatabase::loginToDb(QString log, QString pass)
 bool ClientDatabase::auth(QString log, QString pass)
 {
     QSqlQuery query;
-    query.prepare(QString("SELECT authorize('%1', '%2')").arg(log).arg(pass));
+    query.prepare(QString("SELECT authorize('%1', encode(digest('%2', 'sha256'), 'hex'))").arg(log).arg(pass));
     if(query.exec()){
         query.last();
         qDebug() << query.value(0) << log;
@@ -30,8 +30,9 @@ bool ClientDatabase::auth(QString log, QString pass)
     }
 }
 
-QString ClientDatabase::getGroups()
+result ClientDatabase::getGroups()
 {
+    result res;
     QSqlQuery query;
     QJsonArray grArr;
     query.prepare("SELECT * FROM item_types");
@@ -43,10 +44,37 @@ QString ClientDatabase::getGroups()
             grArr.append(grp);
         }
         QJsonDocument doc(grArr);
-        return doc.toJson(QJsonDocument::Compact);
+        res.resStr = doc.toJson(QJsonDocument::Compact);
     } else {
         qDebug() << "failed on getGroups";
         qDebug() << query.lastError().databaseText();
-        return "NULL";
+        res.isError = true;
+        res.errorCode = query.lastError().number();
     }
+    return res;
+}
+
+result ClientDatabase::getItemsFromGroup(int grId)
+{
+    result res;
+    QSqlQuery query;
+    QJsonArray itemArr;
+    query.prepare(QString("SELECT id_item,  name_item, price_item_usd FROM items WHERE type_id_item = %1").arg(grId));
+    if(query.exec()){
+        while (query.next()){
+            QJsonObject grp;
+            grp["itemId"] = query.value(0).toInt();
+            grp["itemName"] = query.value(1).toString();
+            grp["itemPrice"] = query.value(2).toInt();
+            itemArr.append(grp);
+        }
+        QJsonDocument doc(itemArr);
+        res.resStr = doc.toJson(QJsonDocument::Compact);
+    } else {
+        qDebug() << "failed on getItems";
+        qDebug() << query.lastError().databaseText();
+        res.isError = true;
+        res.errorCode = query.lastError().number();
+    }
+    return res;
 }

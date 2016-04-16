@@ -26,6 +26,9 @@ MainWindow::MainWindow(QWidget *parent)
     finLay->addWidget(finBox);
     QGroupBox* confBox = new QGroupBox("Конфигурация");
     finLay->addWidget(confBox);
+    finBox->setMinimumWidth(150);
+
+    connect(catBox, SIGNAL(currentIndexChanged(int)), this, SLOT(onGroupIndexChanged(int)));
 }
 
 MainWindow::~MainWindow()
@@ -46,4 +49,26 @@ void MainWindow::onNewGroup(QString name)
 void MainWindow::clearGroups()
 {
     catBox->clear();
+}
+
+void MainWindow::onGroupIndexChanged(int ind)
+{
+    if(ind != -1)
+        emit this->currentGroupChangedSig(ind);
+}
+
+void MainWindow::onNewItem(QString name)
+{
+    mainList->addItem(new QListWidgetItem(name));
+}
+
+void MainWindow::clearItems()
+{
+    mainList->clear();
+}
+
+void MainWindow::onItemRowChanged(int row)
+{
+    if(row != -1)
+        emit this->currenrItemChangedSig(row);
 }

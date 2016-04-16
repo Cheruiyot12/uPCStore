@@ -5,7 +5,7 @@
 #-------------------------------------------------
 
 QT       += core gui network websockets
-
+QMAKE_CXXFLAGS += -std=c++0x
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 
 TARGET = uClient
@@ -17,10 +17,12 @@ SOURCES += main.cpp\
     connector.cpp \
     core.cpp \
     loginwidget.cpp \
-    itemgroup.cpp
+    itemgroup.cpp \
+    item.cpp
 
 HEADERS  += mainwindow.h \
     connector.h \
     core.h \
     loginwidget.h \
-    itemgroup.h
+    itemgroup.h \
+    item.h

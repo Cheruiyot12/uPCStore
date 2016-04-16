@@ -6,8 +6,10 @@
 #include <loginwidget.h>
 #include <connector.h>
 #include <itemgroup.h>
+#include <item.h>
 #include <QJsonObject>
 #include <QJsonDocument>
+#include <QDebug>
 
 
 class Core : public QObject
@@ -26,11 +28,18 @@ public slots:
 
     void onNewGroup(QJsonObject json);
     void groupsToBox();
+    void onCurrGrChanged(int ind);
+    void clearGrList();
+
+    void onNewItem(QJsonObject json);
+    void itemsToList();
+    void clearItmList();
 private:
     MainWindow* mw;
     LoginWidget* lw;
     Connector* con;
     QList<ItemGroup*> groupList;
+    QList<Item*> items;
 
 };
 

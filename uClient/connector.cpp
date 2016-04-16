@@ -45,14 +45,27 @@ void Connector::onTextMsg(QString msg)
     }
     case getItemGroups:
     {
+        emit this->clearGr();
         QJsonDocument grDoc;
         grDoc = QJsonDocument::fromJson(obj["groupArr"].toString().toUtf8());
         QJsonArray grArr = grDoc.array();
         for (int i = 0; i < grArr.size(); i++){
-            //qDebug() << grArr.at(i).toObject().value("groupName").toString();
             emit this->onNewGroup(grArr.at(i).toObject());
         }
-
+        emit this->groupsToWidget();
+        break;
+    }
+    case getItemsFromGroup:
+    {
+        emit this->clearItms();
+        QJsonDocument itmDoc;
+        itmDoc = QJsonDocument::fromJson(obj["itmsArr"].toString().toUtf8());
+        QJsonArray itmArr = itmDoc.array();
+        for (int i = 0; i < itmArr.size(); i++){
+            emit this->onNewItem(itmArr.at(i).toObject());
+        }
+        emit this->itemsToList();
+        break;
     }
     default:
         break;

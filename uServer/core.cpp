@@ -90,8 +90,7 @@ void Core::readConfig()
             backPath = jsonDoc.object().value("backupDestination").toString();
 
         }
-    }else
-    {
+    } else {
         qDebug()<<parseError.errorString();
     }
 

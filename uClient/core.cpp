@@ -16,6 +16,12 @@ void Core::showInterface()
     connect(con, SIGNAL(onSuccessLogin()), this, SLOT(onSucessLogin()));
     connect(con, SIGNAL(onErr(int)), this ,SLOT(errorHandler(int)));
     connect(con, SIGNAL(onNewGroup(QJsonObject)), this, SLOT(onNewGroup(QJsonObject)));
+    connect(mw, SIGNAL(currentGroupChangedSig(int)), this, SLOT(onCurrGrChanged(int)));
+    connect(con, SIGNAL(groupsToWidget()), this, SLOT(groupsToBox()));
+    connect(con, SIGNAL(onNewItem(QJsonObject)), this ,SLOT(onNewItem(QJsonObject)));
+    connect(con, SIGNAL(itemsToList()), this, SLOT(itemsToList()));
+    connect(con, SIGNAL(clearGr()), this, SLOT(clearGrList()));
+    connect(con, SIGNAL(clearItms()), this, SLOT(clearItmList()));
     lw->show();
 }
 
@@ -50,6 +56,9 @@ void Core::errorHandler(int code)
     case wronglogpass:
         mw->showErr("Неверный логин или пароль");
         break;
+    case nopermisssions:
+        mw->showErr("У вас недостаточно прав на выполнение этого действия");
+        break;
     default:
         break;
     }
@@ -60,7 +69,7 @@ void Core::onNewGroup(QJsonObject json)
     ItemGroup* newGroup = new ItemGroup();
     newGroup->fromJson(&json);
     groupList.append(newGroup);
-    groupsToBox();
+    //groupsToBox();
 }
 
 void Core::groupsToBox()
@@ -69,4 +78,41 @@ void Core::groupsToBox()
     for(int i = 0; i < groupList.size(); i++){
         mw->onNewGroup(groupList.at(i)->getName());
     }
+}
+
+void Core::onCurrGrChanged(int ind)
+{
+    QJsonObject obj;
+    obj["command"] = getItemsFromGroup;
+    obj["groupId"] = groupList.at(ind)->getId();
+
+    QJsonDocument doc(obj);
+    con->sendTextMess(doc.toJson(QJsonDocument::Compact));
+
+}
+
+void Core::onNewItem(QJsonObject json)
+{
+    Item* newItem = new Item();
+
+    newItem->fromJson(&json);
+    items.append(newItem);
+}
+
+void Core::itemsToList()
+{
+    mw->clearItems();
+    for(int i = 0; i < items.size(); i++){
+        mw->onNewItem(items.at(i)->getName());
+    }
+}
+
+void Core::clearGrList()
+{
+    groupList.clear();
+}
+
+void Core::clearItmList()
+{
+    items.clear();
 }
