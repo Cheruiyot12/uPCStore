@@ -22,6 +22,11 @@ void Core::showInterface()
     connect(con, SIGNAL(itemsToList()), this, SLOT(itemsToList()));
     connect(con, SIGNAL(clearGr()), this, SLOT(clearGrList()));
     connect(con, SIGNAL(clearItms()), this, SLOT(clearItmList()));
+    connect(mw, SIGNAL(onItemClickedToAddSig(int)), this, SLOT(addItemToComp(int)));
+    connect(mw, SIGNAL(onItemClickedToDelSig(int)), this, SLOT(delItemFromComp(int)));
+    connect(con, SIGNAL(sendItemValuesToShow(QStringList*,QStringList*,QStringList*)),
+            mw, SLOT(procInfoAboutItem(QStringList*,QStringList*,QStringList*)));
+    connect(mw, SIGNAL(onShowInfoAboutItemSig(int)), this, SLOT(showInfo(int)));
     lw->show();
 }
 
@@ -116,3 +121,30 @@ void Core::clearItmList()
 {
     items.clear();
 }
+
+void Core::addItemToComp(int id)
+{
+    Item* itm = items.at(id);
+    comp.addHardware(itm);
+    mw->onItemToComp(itm->getName(), itm->getId());
+}
+
+void Core::delItemFromComp(int id)
+{
+    //Item* itm = items.at(id);
+    //Item* itm;
+    comp.delHardware(id);
+    mw->onItemDelComp(id);
+}
+
+void Core::showInfo(int id)
+{
+    QJsonObject obj;
+    obj["command"] = getItemCharValues;
+    obj["type"] = valuesToShow;
+    obj["itemId"] = id;
+
+    QJsonDocument doc(obj);
+    con->sendTextMess(doc.toJson(QJsonDocument::Compact));
+}
+

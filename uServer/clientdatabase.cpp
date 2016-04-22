@@ -78,3 +78,31 @@ result ClientDatabase::getItemsFromGroup(int grId)
     }
     return res;
 }
+
+result ClientDatabase::getCharsOfItem(int itemId)
+{
+    result res;
+    QSqlQuery query;
+    QJsonArray itemArr;
+    query.prepare(QString("SELECT * FROM text_chars WHERE id_item = %1;").arg(itemId));
+    if(query.exec()){
+        while (query.next()){
+            QJsonObject grp;
+            grp["itemId"] = query.value(0).toInt();
+            grp["charId"] = query.value(1).toInt();
+            grp["charName"] = query.value(2).toString();
+            grp["charValue"] = query.value(3).toString();
+            grp["charUnits"] = query.value(4).toString();
+
+            itemArr.append(grp);
+        }
+        QJsonDocument doc(itemArr);
+        res.resStr = doc.toJson(QJsonDocument::Compact);
+    } else {
+        qDebug() << "failed on getCharValues";
+        qDebug() << query.lastError().databaseText();
+        res.isError = true;
+        res.errorCode = query.lastError().number();
+    }
+    return res;
+}

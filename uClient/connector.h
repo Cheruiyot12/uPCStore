@@ -24,6 +24,8 @@ signals:
     void onNewItem(QJsonObject obj);
     void itemsToList();
     void clearItms();
+
+    void sendItemValuesToShow(QStringList*, QStringList*, QStringList*);
 public slots:
     void connect2server(QUrl url);
     void sendTextMess(QString msg);

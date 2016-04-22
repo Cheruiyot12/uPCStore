@@ -7,6 +7,7 @@
 #include <QLabel>
 #include <QLineEdit>
 #include <QUrl>
+#include <QPalette>
 
 class LoginWidget : public QWidget
 {

@@ -18,11 +18,15 @@ SOURCES += main.cpp\
     core.cpp \
     loginwidget.cpp \
     itemgroup.cpp \
-    item.cpp
+    item.cpp \
+    computer.cpp \
+    iteminfowidget.cpp
 
 HEADERS  += mainwindow.h \
     connector.h \
     core.h \
     loginwidget.h \
     itemgroup.h \
-    item.h
+    item.h \
+    computer.h \
+    iteminfowidget.h

@@ -2,23 +2,31 @@
 
 LoginWidget::LoginWidget(QWidget *parent) : QWidget(parent)
 {
+
+    QPalette pal;
+    pal.setColor(QPalette::Highlight, QColor(142,45,197).lighter());
+    pal.setColor(QPalette::HighlightedText, Qt::white);
+    //this->setPalette(pal);
+
     QGridLayout* mainlay = new QGridLayout();
     this->setLayout(mainlay);
     mainlay->addWidget(new QLabel("Login: ", 0, 0));
     mainlay->addWidget(new QLabel("Password: "), 1, 0);
     mainlay->addWidget(new QLabel("IP address: "), 2, 0);
 
-    logLine = new QLineEdit();
-    passLine = new QLineEdit();
-    ipLine = new QLineEdit();
+    logLine = new QLineEdit(this);
+    //logLine->setPalette(pal);
+
+    passLine = new QLineEdit(this);
+    ipLine = new QLineEdit(this);
     ipLine->setText("localhost");
     mainlay->addWidget(logLine, 0, 1);
     mainlay->addWidget(passLine, 1, 1);
     mainlay->addWidget(ipLine, 2, 1);
 
-    logIn = new QPushButton("Log In");
+    logIn = new QPushButton("Log In", this);
     mainlay->addWidget(logIn,3,0);
-    QPushButton* conn = new QPushButton("Connect");
+    QPushButton* conn = new QPushButton("Connect", this);
     mainlay->addWidget(conn,3,1);
 
     connect(conn, SIGNAL(clicked(bool)), this, SLOT(onConnect()));

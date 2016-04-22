@@ -10,6 +10,7 @@
 #include <QJsonObject>
 #include <QJsonDocument>
 #include <QDebug>
+#include <computer.h>
 
 
 class Core : public QObject
@@ -34,12 +35,18 @@ public slots:
     void onNewItem(QJsonObject json);
     void itemsToList();
     void clearItmList();
+    void addItemToComp(int id);
+    void delItemFromComp(int id);
+
+    void showInfo(int id);
 private:
     MainWindow* mw;
     LoginWidget* lw;
     Connector* con;
     QList<ItemGroup*> groupList;
     QList<Item*> items;
+    Computer comp;
+
 
 };
 

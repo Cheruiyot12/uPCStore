@@ -93,6 +93,35 @@ void Client::onTextMessage(QString msg)
         }
         break;
     }
+    case getItemCharValues:
+    {
+        result res = dataBase->getCharsOfItem(obj["itemId"].toInt());
+        if(!res.isError){
+            QJsonObject itms;
+            itms["command"] = getItemCharValues;
+            itms["type"] = obj["type"];
+            itms["itmsArr"]= res.resStr;
+            QJsonDocument itm2send(itms);
+
+            this->sendTextMes(itm2send.toJson(QJsonDocument::Compact));
+        } else {
+            QJsonObject uData;
+            uData["command"] = error;
+            switch (res.errorCode) {
+            case 42501:
+            {
+                uData["eRRoRcode"] = nopermisssions;
+                break;
+            }
+            default:
+                break;
+            }
+            QJsonDocument uDoc(uData);
+            this->sendTextMes(uDoc.toJson(QJsonDocument::Compact));
+        }
+        break;
+        break;
+    }
     default:
         break;
     }

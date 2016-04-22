@@ -67,6 +67,27 @@ void Connector::onTextMsg(QString msg)
         emit this->itemsToList();
         break;
     }
+    case getItemCharValues:
+    {
+        if(obj["type"].toInt() == valuesToShow){
+            QStringList s1, s2, s3;
+            QJsonObject valObj;
+            //emit this->clearItms();
+            QJsonDocument itmDoc;
+            itmDoc = QJsonDocument::fromJson(obj["itmsArr"].toString().toUtf8());
+            QJsonArray itmArr = itmDoc.array();
+            for (int i = 0; i < itmArr.size(); i++){
+                valObj = itmArr.at(i).toObject();
+                s1.append(valObj["charName"].toString());
+                s2.append(valObj["charValue"].toString());
+                s3.append(valObj["charUnits"].toString());
+            }
+            emit this->sendItemValuesToShow(&s1,&s2,&s3);
+        }else{
+            //TODO
+        }
+        break;
+    }
     default:
         break;
     }

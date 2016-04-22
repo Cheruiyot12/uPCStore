@@ -32,6 +32,7 @@ public slots:
     bool auth(QString log, QString pass);
     result getGroups();
     result getItemsFromGroup(int grId);
+    result getCharsOfItem(int itemId);
 private:
     QSqlDatabase mainDB;
 
