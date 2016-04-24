@@ -26,5 +26,6 @@ void Item::fromJson(QJsonObject *json)
 {
     id = json->value("itemId").toInt();
     name = json->value("itemName").toString();
-    price = json->value("itemPrice").toInt();
+    //qDebug() << json->value("itemPrice") << "------------------------------";
+    price = json->value("itemPrice").toDouble();
 }

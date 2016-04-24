@@ -88,6 +88,11 @@ void Connector::onTextMsg(QString msg)
         }
         break;
     }
+    case placeOrd:
+    {
+        emit this->orderPlacedSig(obj["orderId"].toInt());
+        break;
+    }
     default:
         break;
     }

@@ -26,6 +26,8 @@ signals:
     void clearItms();
 
     void sendItemValuesToShow(QStringList*, QStringList*, QStringList*);
+
+    void orderPlacedSig(int id);
 public slots:
     void connect2server(QUrl url);
     void sendTextMess(QString msg);

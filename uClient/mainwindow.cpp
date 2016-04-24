@@ -35,13 +35,21 @@ MainWindow::MainWindow(QWidget *parent)
 
     compList->setContextMenuPolicy(Qt::CustomContextMenu);
 
+    QGridLayout *flay = new QGridLayout(finBox);
+    flay->addWidget(new QLabel("Цена:"),0,0);
+    priceLabel = new QLabel("0");
+    flay->addWidget(priceLabel,0,1);
+
     //ItemInfoWidget* inftest = new ItemInfoWidget(QStringList({"test", "test1", "test2"}), QStringList({"000", "150", "69"}), QStringList({"km", "kg", "GHz"}));
 
     //inftest->show();
+    QPushButton* sendOrder = new QPushButton("Отправить заказ");
+    flay->addWidget(sendOrder,1,0);
 
     connect(catBox, SIGNAL(currentIndexChanged(int)), this, SLOT(onGroupIndexChanged(int)));
     connect(mainList, SIGNAL(itemClicked(QListWidgetItem*)), this, SLOT(onItemClickedToAdd(QListWidgetItem*)));
     connect(compList, SIGNAL(customContextMenuRequested(QPoint)), this, SLOT(showCompContextMenu(QPoint)));
+    connect(sendOrder, SIGNAL(clicked(bool)), this, SLOT(sendOrderClicked()));
 }
 
 MainWindow::~MainWindow()
@@ -139,4 +147,26 @@ void MainWindow::deleteItemFromComp()
     //for(int i = 0; i < compList->selectedItems().size(); i++){
         emit this->onItemClickedToDelSig(compList->selectedItems().at(0)->data(1000).toInt());
     //}
+}
+
+void MainWindow::setPrice(double price)
+{
+    //qDebug() << price << "_-------------------------------------";
+    priceLabel->setText(QString("%1 $").arg(price));
+}
+
+void MainWindow::sendOrderClicked()
+{
+    QMessageBox warnMess;
+    //warnMess.setText("Внимание");
+    warnMess.setWindowTitle("Подтверждение");
+    warnMess.setText("Вы хотите отправить заказ?\nПосле отправки содержимое заказа нельзя будет изменить.");
+    warnMess.setStandardButtons(QMessageBox::Cancel | QMessageBox::Ok);
+    warnMess.setMinimumWidth(400);
+
+    int ret = warnMess.exec();
+
+    if(QMessageBox::Ok == ret){
+        emit this->onPlaceOrderSig();
+    }
 }

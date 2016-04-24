@@ -39,6 +39,10 @@ public slots:
     void delItemFromComp(int id);
 
     void showInfo(int id);
+
+    void placeOrder();
+    void onOrderPlaced(int id);
+    void onPlaceOrder();
 private:
     MainWindow* mw;
     LoginWidget* lw;
@@ -46,6 +50,7 @@ private:
     QList<ItemGroup*> groupList;
     QList<Item*> items;
     Computer comp;
+    int orderNumber = 0;
 
 
 };

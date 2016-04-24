@@ -27,6 +27,8 @@ void Core::showInterface()
     connect(con, SIGNAL(sendItemValuesToShow(QStringList*,QStringList*,QStringList*)),
             mw, SLOT(procInfoAboutItem(QStringList*,QStringList*,QStringList*)));
     connect(mw, SIGNAL(onShowInfoAboutItemSig(int)), this, SLOT(showInfo(int)));
+    connect(mw, SIGNAL(onPlaceOrderSig()), this, SLOT(onPlaceOrder()));
+    connect(con, SIGNAL(orderPlacedSig(int)), this, SLOT(onOrderPlaced(int)));
     lw->show();
 }
 
@@ -127,6 +129,7 @@ void Core::addItemToComp(int id)
     Item* itm = items.at(id);
     comp.addHardware(itm);
     mw->onItemToComp(itm->getName(), itm->getId());
+    mw->setPrice(comp.recountPrice());
 }
 
 void Core::delItemFromComp(int id)
@@ -135,6 +138,7 @@ void Core::delItemFromComp(int id)
     //Item* itm;
     comp.delHardware(id);
     mw->onItemDelComp(id);
+    mw->setPrice(comp.recountPrice());
 }
 
 void Core::showInfo(int id)
@@ -148,3 +152,36 @@ void Core::showInfo(int id)
     con->sendTextMess(doc.toJson(QJsonDocument::Compact));
 }
 
+void Core::placeOrder()
+{
+    QJsonObject obj;
+    obj["command"] = placeOrd;
+
+    QJsonDocument doc(obj);
+    con->sendTextMess(doc.toJson(QJsonDocument::Compact));
+}
+
+void Core::onOrderPlaced(int id)
+{
+    orderNumber = id;
+    QJsonObject obj;
+    obj["command"] = addItemsToOrd;
+    obj["orderId"] = orderNumber;
+    obj["itemArr"] = comp.toJson();
+    QJsonDocument doc(obj);
+    con->sendTextMess(doc.toJson(QJsonDocument::Compact));
+}
+
+void Core::onPlaceOrder()
+{
+    if(!comp.isEmpty()){
+        if(orderNumber == 0){
+            placeOrder();
+        } else {
+            mw->showErr("В данной версии программы нельзя изменить отправленный заказ");
+            //TODO
+        }
+    }else{
+        mw->showErr("Нельзя отправить пустой заказ!");
+    }
+}

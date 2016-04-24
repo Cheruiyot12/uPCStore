@@ -33,6 +33,8 @@ public slots:
     result getGroups();
     result getItemsFromGroup(int grId);
     result getCharsOfItem(int itemId);
+    result placeOrder();
+    result addItemToOrder(int orderId, int itemId, int itemCount);
 private:
     QSqlDatabase mainDB;
 

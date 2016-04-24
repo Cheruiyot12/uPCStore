@@ -17,6 +17,7 @@
 #include <QGroupBox>
 #include <QComboBox>
 #include <iteminfowidget.h>
+#include <QDebug>
 
 
 class MainWindow : public QMainWindow
@@ -37,11 +38,13 @@ public slots:
     void onItemToComp(QString name, int id);
     void onItemDelComp(int id);
     void procInfoAboutItem(QStringList *st1, QStringList *st2, QStringList *st3);
+    void setPrice(double price);
 private:
     QComboBox* catBox;
     QListWidget* mainList;
     QListWidget* compList;
     ItemInfoWidget* infoWidget;
+    QLabel* priceLabel;
 private slots:
     void onGroupIndexChanged(int ind);
     void onItemRowChanged(int row);
@@ -49,12 +52,14 @@ private slots:
     void showCompContextMenu(const QPoint &p);
     void showInfoAboutItem();
     void deleteItemFromComp();
+    void sendOrderClicked();
 signals:
     void currentGroupChangedSig(int id);
     void currenrItemChangedSig(int id);
     void onItemClickedToAddSig(int id);
     void onItemClickedToDelSig(int id);
     void onShowInfoAboutItemSig(int id);
+    void onPlaceOrderSig();
 };
 
 #endif // MAINWINDOW_H

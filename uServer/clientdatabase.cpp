@@ -65,7 +65,8 @@ result ClientDatabase::getItemsFromGroup(int grId)
             QJsonObject grp;
             grp["itemId"] = query.value(0).toInt();
             grp["itemName"] = query.value(1).toString();
-            grp["itemPrice"] = query.value(2).toInt();
+            grp["itemPrice"] = query.value(2).toDouble();
+            //qDebug() << query.value(2) << "--------------------------";
             itemArr.append(grp);
         }
         QJsonDocument doc(itemArr);
@@ -100,6 +101,41 @@ result ClientDatabase::getCharsOfItem(int itemId)
         res.resStr = doc.toJson(QJsonDocument::Compact);
     } else {
         qDebug() << "failed on getCharValues";
+        qDebug() << query.lastError().databaseText();
+        res.isError = true;
+        res.errorCode = query.lastError().number();
+    }
+    return res;
+}
+
+result ClientDatabase::placeOrder()
+{
+    result res;
+    QSqlQuery query;
+    query.prepare(QString("INSERT INTO orders(id_customer, order_date) "
+                          "VALUES ((SELECT id_user FROM users WHERE users.login_user = quote_ident(USER)), now()) "
+                          "RETURNING id_order;"));
+    if (query.exec()){
+        query.last();
+        res.resStr = QString("%1").arg(query.value(0).toInt());
+    } else {
+        qDebug() << "failed on placeOrder";
+        qDebug() << query.lastError().databaseText();
+        res.isError = true;
+        res.errorCode = query.lastError().number();
+    }
+    return res;
+}
+
+result ClientDatabase::addItemToOrder(int orderId, int itemId, int itemCount)
+{
+    result res;
+    QSqlQuery query;
+    query.prepare(QString("INSERT INTO orders_items VALUES('%1', '%2', '%3')").arg(orderId).arg(itemId).arg(itemCount));
+    if (query.exec()){
+        return res;
+    } else {
+        qDebug() << "failed on addItemToOrder";
         qDebug() << query.lastError().databaseText();
         res.isError = true;
         res.errorCode = query.lastError().number();

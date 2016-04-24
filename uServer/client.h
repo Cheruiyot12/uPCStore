@@ -25,6 +25,7 @@ private:
 
     bool isDebug = true;
     void sendTextMes(QString msg);
+    QByteArray handleError(int errCode);
 private slots:
     void onTextMessage(QString msg);
     void onDisconnect();

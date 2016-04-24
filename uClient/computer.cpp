@@ -5,9 +5,18 @@ Computer::Computer(QObject *parent) : QObject(parent)
 
 }
 
-QJsonObject Computer::toJson()
+QString Computer::toJson()
 {
     //TODO
+
+    QJsonArray arr;
+    for (int i = 0; i < hardware.size(); i++){
+        QJsonObject cObj;
+        cObj["itemId"] = hardware.at(i)->getId();
+        arr.append(cObj);
+    }
+    QJsonDocument doc(arr);
+    return doc.toJson(QJsonDocument::Compact);
 }
 
 void Computer::addHardware(Item *itm)
@@ -34,3 +43,12 @@ void Computer::delHardware(int id)
 {
     //TODO
 }*/
+
+double Computer::recountPrice()
+{
+    double ret = 0.0;
+    for(int i = 0; i < hardware.size(); i++){
+        ret += hardware.at(i)->getPrice();
+    }
+    return ret;
+}

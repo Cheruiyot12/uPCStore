@@ -3,6 +3,7 @@
 
 #include <QObject>
 #include <QJsonObject>
+#include <QDebug>
 
 class Item : public QObject
 {
@@ -12,7 +13,7 @@ public:
     Item(int nid, QString nname, int nprice, QObject *parent = 0);
     int getId(){return id;}
     QString getName(){return name;}
-    int getPrice(){return price;}
+    double getPrice(){return price;}
 
 signals:
 
@@ -22,7 +23,7 @@ public slots:
 private:
     int id;
     QString name;
-    float price;
+    double price;
 };
 
 #endif // ITEM_H

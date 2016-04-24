@@ -6,6 +6,7 @@
 #include <QList>
 #include <QJsonObject>
 #include <QJsonDocument>
+#include <QJsonArray>
 #include <QString>
 #include <QDebug>
 
@@ -18,11 +19,13 @@ public:
 signals:
 
 public slots:
-    QJsonObject toJson();
+    QString toJson();
     void addHardware(Item* itm);
     void delHardware(Item* itm);
     void delHardware(int id);
     //void checkCompability(Item* itm);
+    double recountPrice();
+    bool isEmpty(){return hardware.empty();}
 
 private:
     QList<Item*> hardware;

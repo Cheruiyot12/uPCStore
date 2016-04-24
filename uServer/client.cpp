@@ -50,19 +50,7 @@ void Client::onTextMessage(QString msg)
 
             this->sendTextMes(gr2send.toJson(QJsonDocument::Compact));
         } else {
-            QJsonObject uData;
-            uData["command"] = error;
-            switch (res.errorCode) {
-            case 42501:
-            {
-                uData["eRRoRcode"] = nopermisssions;
-                break;
-            }
-            default:
-                break;
-            }
-            QJsonDocument uDoc(uData);
-            this->sendTextMes(uDoc.toJson(QJsonDocument::Compact));
+            this->sendTextMes(handleError(res.errorCode));
         }
         break;
     }
@@ -77,19 +65,7 @@ void Client::onTextMessage(QString msg)
 
             this->sendTextMes(itm2send.toJson(QJsonDocument::Compact));
         } else {
-            QJsonObject uData;
-            uData["command"] = error;
-            switch (res.errorCode) {
-            case 42501:
-            {
-                uData["eRRoRcode"] = nopermisssions;
-                break;
-            }
-            default:
-                break;
-            }
-            QJsonDocument uDoc(uData);
-            this->sendTextMes(uDoc.toJson(QJsonDocument::Compact));
+            this->sendTextMes(handleError(res.errorCode));
         }
         break;
     }
@@ -105,26 +81,65 @@ void Client::onTextMessage(QString msg)
 
             this->sendTextMes(itm2send.toJson(QJsonDocument::Compact));
         } else {
-            QJsonObject uData;
-            uData["command"] = error;
-            switch (res.errorCode) {
-            case 42501:
-            {
-                uData["eRRoRcode"] = nopermisssions;
-                break;
-            }
-            default:
-                break;
-            }
-            QJsonDocument uDoc(uData);
-            this->sendTextMes(uDoc.toJson(QJsonDocument::Compact));
+            this->sendTextMes(handleError(res.errorCode));
         }
         break;
+    }
+    case placeOrd:
+    {
+        result res = dataBase->placeOrder();
+        if(!res.isError){
+            QJsonObject itms;
+            itms["command"] = placeOrd;
+            itms["orderId"] = res.resStr.toInt();
+            QJsonDocument itm2send(itms);
+
+            this->sendTextMes(itm2send.toJson(QJsonDocument::Compact));
+        } else {
+            this->sendTextMes(handleError(res.errorCode));
+        }
+        break;
+    }
+    case addItemsToOrd:
+    {
+        QJsonDocument itmDoc;
+        result rest;
+        itmDoc = QJsonDocument::fromJson(obj["itemArr"].toString().toUtf8());
+        QJsonArray itmArr = itmDoc.array();
+        for (int i = 0; i < itmArr.size(); i++){
+           rest = dataBase->addItemToOrder(obj["orderId"].toInt(),
+                                                  itmArr.at(i).toObject().value("itemId").toInt(),
+                                                  1);
+           if(rest.isError){
+               this->sendTextMes(handleError(rest.errorCode));
+           }
+        }
         break;
     }
     default:
         break;
     }
+}
+
+
+QByteArray Client::handleError(int errCode)
+{
+    QJsonObject uData;
+    uData["command"] = error;
+    switch (errCode) {
+    case 42501:
+    {
+        uData["eRRoRcode"] = nopermisssions;
+        break;
+    }
+    default:
+    {
+        uData["eRRoRcode"] = undefinederror;
+        break;
+    }
+    }
+    QJsonDocument uDoc(uData);
+    return uDoc.toJson(QJsonDocument::Compact);
 }
 
 void Client::onDisconnect()
