@@ -176,7 +176,29 @@ void Client::onTextMessage(QString msg)
             it.charUnits = arr.at(i).toObject().value("charUnits").toString();
             ql->append(it);
         }
-        dataBase->addItem(obj["typeId"].toInt(), obj["itemName"].toString(), obj["itemPrice"].toDouble(), ql);
+        result res = dataBase->addItem(obj["typeId"].toInt(), obj["itemName"].toString(), obj["itemPrice"].toDouble(), ql);
+
+        if(!res.isError){
+            QJsonObject objcc;
+            objcc["command"] = successDelItem;
+            QJsonDocument doct(objcc);
+            this->sendTextMes(doct.toJson(QJsonDocument::Compact));
+        } else {
+            this->sendTextMes(handleError(res.errorCode));
+        }
+        break;
+    }
+    case delItem:
+    {
+        result res = dataBase->deleteItem(obj["itemId"].toInt());
+        if(!res.isError){
+            QJsonObject objcc;
+            objcc["command"] = successDelItem;
+            QJsonDocument doct(objcc);
+            this->sendTextMes(doct.toJson(QJsonDocument::Compact));
+        } else {
+            this->sendTextMes(handleError(res.errorCode));
+        }
         break;
     }
     default:

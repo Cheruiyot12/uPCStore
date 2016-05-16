@@ -37,6 +37,8 @@ void Core::showInterface()
     connect(con, SIGNAL(onCharNames(QList<chars>*)), this, SLOT(loadChNames(QList<chars>*)));
     connect(mw, SIGNAL(onSaveReqSig(openMode,int,QString,float,QList<itemChars>*)),
             this, SLOT(onSaveReq(openMode,int,QString,float,QList<itemChars>*)));
+    connect(mw, SIGNAL(deleteSelectedItem(int)), this, SLOT(onDeleteItm(int)));
+    connect(con, SIGNAL(succDelItem()), this, SLOT(onSuccDelIt()));
     lw->show();
 }
 
@@ -301,4 +303,18 @@ void Core::onSaveReq(openMode sMode, int nnid, QString nnme, float nprce, QList<
         obj["chars"] = ss;
         QJsonDocument ob(obj);
         con->sendTextMess(ob.toJson(QJsonDocument::Compact));
+}
+
+void Core::onDeleteItm(int ind)
+{
+    QJsonObject obj;
+    obj["command"] = delItem;
+    obj["itemId"] = items.at(ind)->getId();
+    QJsonDocument doc(obj);
+    con->sendTextMess(doc.toJson(QJsonDocument::Compact));
+}
+
+void Core::onSuccDelIt()
+{
+    onCurrGrChanged(groupList.indexOf(curGr));
 }

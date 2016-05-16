@@ -53,6 +53,9 @@ public slots:
     void loadChNames(QList<chars> *ql);
 
     void onSaveReq(openMode sMode, int nnid, QString nnme, float nprce, QList<itemChars>* nchrs);
+    void onDeleteItm(int ind);
+
+    void onSuccDelIt();
 private:
     MainWindow* mw;
     LoginWidget* lw;

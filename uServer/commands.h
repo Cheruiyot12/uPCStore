@@ -16,7 +16,9 @@ static const int getPermissions = 10;
 static const int getCharNames = 11;
 static const int editItem = 12;
 static const int addItem = 13;
-
+static const int delItem = 14;
+static const int successDelItem = 15;
+static const int successAddItem = 16;
 
 
 

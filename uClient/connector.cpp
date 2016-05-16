@@ -136,6 +136,11 @@ void Connector::onTextMsg(QString msg)
         emit this->onCharNames(ql);
         break;
     }
+    case successDelItem:
+    {
+        emit this->succDelItem();
+        break;
+    }
     default:
         break;
     }

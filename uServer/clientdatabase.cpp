@@ -236,3 +236,22 @@ result ClientDatabase::addItem(int typeId, QString nnme, float nprice, QList<ite
     }
     return res;
 }
+
+result ClientDatabase::deleteItem(int itemId)
+{
+    result res;
+    QSqlQuery query;
+
+    if(query.exec(QString(
+                          "DELETE FROM char_text_values WHERE id_item = %1; "
+                      "DELETE FROM items WHERE id_item = %1; "
+                      "DELETE FROM orders_items WHERE id_item = %1;").arg(itemId))){
+    } else {
+        qDebug() << "failed on delitem";
+        qDebug() << query.lastError().databaseText();
+        res.isError = true;
+        res.errorCode = query.lastError().number();
+    }
+    return res;
+
+}

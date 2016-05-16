@@ -41,6 +41,7 @@ public slots:
     result getCharNames(int itemTypeId);
     result editItem(int nnid, QString nnme, float nprce, QList<itemChars>* nchrs);
     result addItem(int typeId, QString nnme, float nprice, QList<itemChars>* nchrs);
+    result deleteItem(int itemId);
 private:
     QSqlDatabase mainDB;
 

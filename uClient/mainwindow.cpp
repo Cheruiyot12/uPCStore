@@ -228,6 +228,7 @@ void MainWindow::modItemSel()
 
 void MainWindow::delItemSel()
 {
+    emit this->deleteSelectedItem(mainList->row(mainList->selectedItems().at(0)));
 
 }
 

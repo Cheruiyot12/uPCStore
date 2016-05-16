@@ -81,6 +81,7 @@ signals:
     void selectItemToMod(int num);
     void onLoadChrsReqSig();
     void onSaveReqSig(openMode sMode, int nnid, QString nnme, float nprce, QList<itemChars>* nchrs);
+    void deleteSelectedItem(int ind);
 };
 
 #endif // MAINWINDOW_H

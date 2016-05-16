@@ -32,6 +32,8 @@ signals:
 
     void obtaintedPermsSig(QString perms);
     void onCharNames(QList<chars> *);
+
+    void succDelItem();
 public slots:
     void connect2server(QUrl url);
     void sendTextMess(QString msg);
