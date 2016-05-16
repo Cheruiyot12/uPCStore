@@ -221,8 +221,14 @@ void Core::onObtaintedPermissions(QString st)
 void Core::onItemSelectedToMod(int num)
 {
     itemSelectedToModNum = num;
+    if(num!=-1){
+
     Item* itm = items.at(num);
     mw->showEditWidget(itm->getId(), itm->getName(), itm->getPrice(), 1, openMode::editing);
+
+    } else {
+        mw->showEditWidget(-1, "", 0.0, 1, openMode::adding);
+    }
 }
 
 void Core::onCharsRequested()
@@ -234,13 +240,15 @@ void Core::onCharsRequested()
     QJsonDocument doc2(ob2);
     con->sendTextMess(doc2.toJson(QJsonDocument::Compact));
 
-    QJsonObject obj;
-    obj["command"] = getItemCharValues;
-    obj["type"] = valuesToEdit;
-    obj["itemId"] = items.at(itemSelectedToModNum)->getId();
+    if(itemSelectedToModNum!=-1){
+        QJsonObject obj;
+        obj["command"] = getItemCharValues;
+        obj["type"] = valuesToEdit;
+        obj["itemId"] = items.at(itemSelectedToModNum)->getId();
 
-    QJsonDocument doc(obj);
-    con->sendTextMess(doc.toJson(QJsonDocument::Compact));
+        QJsonDocument doc(obj);
+        con->sendTextMess(doc.toJson(QJsonDocument::Compact));
+    }
 
 
 }
@@ -263,31 +271,34 @@ void Core::onSaveReq(openMode sMode, int nnid, QString nnme, float nprce, QList<
 {
     QJsonObject obj;
     QJsonArray chrs;
+    obj["itemPrice"] = nprce;
+    obj["itemName"] = nnme;
+
+    for(int i = 0; i < nchrs->size(); i++){
+        QJsonObject ch;
+        int jjj = 0;
+        for(int j = 0; j < charsList->size(); j++){
+            if(nchrs->at(i).charname == charsList->at(j).charname){
+                jjj = charsList->at(j).charId;
+                break;
+            }
+        }
+        ch["charId"] = jjj;
+        ch["charValue"] = nchrs->at(i).charValue;
+        ch["charUnits"] = nchrs->at(i).charUnits;
+        chrs.append(ch);
+    }
     if(sMode == openMode::editing){
         obj["command"] = editItem;
         obj["itemId"] = items.at(itemSelectedToModNum)->getId();
-        obj["itemPrice"] = nprce;
-        obj["itemName"] = nnme;
+    } else {
+        obj["command"] = addItem;
+        obj["typeId"] = curGr->getId();
+    }
 
-        for(int i = 0; i < nchrs->size(); i++){
-            QJsonObject ch;
-            int jjj = 0;
-            for(int j = 0; j < charsList->size(); j++){
-                if(nchrs->at(i).charname == charsList->at(j).charname){
-                    jjj = charsList->at(j).charId;
-                    break;
-                }
-            }
-            ch["charId"] = jjj;
-            ch["charValue"] = nchrs->at(i).charValue;
-            ch["charUnits"] = nchrs->at(i).charUnits;
-            chrs.append(ch);
-        }
         QJsonDocument ard(chrs);
         QString ss = ard.toJson(QJsonDocument::Compact);
         obj["chars"] = ss;
         QJsonDocument ob(obj);
         con->sendTextMess(ob.toJson(QJsonDocument::Compact));
-
-    }
 }

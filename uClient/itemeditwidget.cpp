@@ -69,6 +69,8 @@ ItemEditWidget::ItemEditWidget(int id, QString nname, float nprice, int ncount, 
     connect(modC, SIGNAL(clicked(bool)), this, SLOT(onModC()));
     connect(delC, SIGNAL(clicked(bool)), this, SLOT(onDelC()));
     connect(saveBut, SIGNAL(clicked(bool)), this, SLOT(onSave()));
+
+    //onLoad();
 }
 
 void ItemEditWidget::loadChrs(QList<itemChars> *chrs)
@@ -110,7 +112,7 @@ void ItemEditWidget::loadChrsNam(QList<chars> *chrs)
     for (int i = 0; i < chrs->size(); i++){
         charType->addItem(chrs->at(i).charname, chrs->at(i).charId);
     }
-    charsLoaded = true;
+    //charsLoaded = true;
 }
 
 void ItemEditWidget::onAdC()
@@ -140,7 +142,7 @@ void ItemEditWidget::onModC()
 void ItemEditWidget::onSave()
 {
     QList<itemChars> *ldedChrs = new QList<itemChars>();
-    if(charsLoaded){
+   // if(charsLoaded){
         for(int i = 0; i < charTabWid->rowCount(); i++){
             itemChars itmc;
             itmc.charname = charTabWid->item(i,0)->text();
@@ -148,6 +150,6 @@ void ItemEditWidget::onSave()
             itmc.charValue = charTabWid->item(i,1)->text();
             ldedChrs->append(itmc);
         }
-    }
+    //}
     emit this->onSaveSig(mod, id, namel->text(), pricel->text().toFloat(), ldedChrs);
 }

@@ -162,6 +162,22 @@ void Client::onTextMessage(QString msg)
             ql->append(it);
         }
         dataBase->editItem(obj["itemId"].toInt(), obj["itemName"].toString(), obj["itemPrice"].toDouble(), ql);
+        break;
+    }
+    case addItem:
+    {
+        QList<itemChars> *ql = new QList<itemChars>;
+        QJsonDocument itmDoc = QJsonDocument::fromJson(obj["chars"].toString().toUtf8());
+        QJsonArray arr = itmDoc.array();
+        for(int i = 0; i < arr.count(); i++){
+            itemChars it;
+            it.charId = arr.at(i).toObject().value("charId").toInt();
+            it.charValue = arr.at(i).toObject().value("charValue").toString();
+            it.charUnits = arr.at(i).toObject().value("charUnits").toString();
+            ql->append(it);
+        }
+        dataBase->addItem(obj["typeId"].toInt(), obj["itemName"].toString(), obj["itemPrice"].toDouble(), ql);
+        break;
     }
     default:
         break;

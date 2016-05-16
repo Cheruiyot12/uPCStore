@@ -207,3 +207,32 @@ result ClientDatabase::editItem(int nnid, QString nnme, float nprce, QList<itemC
     }
     return res;
 }
+
+result ClientDatabase::addItem(int typeId, QString nnme, float nprice, QList<itemChars> *nchrs)
+{
+    result res;
+    QSqlQuery query;
+
+    if(query.exec(QString(
+                          "INSERT INTO items(type_id_item, name_item, price_item_usd, count_in_storage_item) "
+                      "VALUES(%1, '%2', %3, 1) "
+                      "RETURNING id_item;").arg(typeId).arg(nnme).arg(nprice))){
+        query.last();
+        int nId = query.value(0).toInt();
+        for(int i = 0; i < nchrs->size(); i++){
+            if(!query.exec(QString("INSERT INTO char_text_values "
+                               "VALUES(%1, %2, '%3', '%4');").arg(nchrs->at(i).charId).arg(nId).arg(nchrs->at(i).charValue).arg(nchrs->at(i).charUnits))){
+                qDebug() << "failed on addchars";
+                qDebug() << query.lastError().databaseText();
+                res.isError = true;
+                res.errorCode = query.lastError().number();
+            }
+        }
+    } else {
+        qDebug() << "failed on additem";
+        qDebug() << query.lastError().databaseText();
+        res.isError = true;
+        res.errorCode = query.lastError().number();
+    }
+    return res;
+}

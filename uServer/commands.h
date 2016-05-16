@@ -15,6 +15,7 @@ static const int orderSuccPlaces = 9;
 static const int getPermissions = 10;
 static const int getCharNames = 11;
 static const int editItem = 12;
+static const int addItem = 13;
 
 
 

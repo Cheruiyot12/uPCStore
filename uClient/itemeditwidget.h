@@ -34,6 +34,7 @@ signals:
 public slots:
     void loadChrs(QList<itemChars>*chrs);
     void loadChrsNam(QList<chars>*chrs);
+    void onLoad();
 
 private:
     int id, typeId, count;
@@ -50,7 +51,7 @@ private:
     QPushButton *adC, *modC, *delC, *saveBut;
 
 private slots:
-    void onLoad();
+
     void onSelect();
     void onAdC();
     void onModC();

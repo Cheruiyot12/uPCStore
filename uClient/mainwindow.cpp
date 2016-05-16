@@ -217,7 +217,7 @@ void MainWindow::showMainContextMenu(const QPoint &p)
 
 void MainWindow::addItemSel()
 {
-
+    emit this->selectItemToMod(-1);
 }
 
 void MainWindow::modItemSel()
@@ -235,7 +235,7 @@ void MainWindow::showEditWidget(int nid, QString nname, float nprice, int ncount
 {
     if(editWidget != nullptr)
         delete editWidget;
-    ItemEditWidget* ed = new ItemEditWidget(nid, nname, nprice, ncount, openMode::editing, this);
+    ItemEditWidget* ed = new ItemEditWidget(nid, nname, nprice, ncount, mode, this);
     connect(ed, SIGNAL(getChrs()), this, SLOT(onLoadChrsReq()));
     connect(ed, SIGNAL(onSaveSig(openMode,int,QString,float,QList<itemChars>*)),
             this, SLOT(onSavReq(openMode,int,QString,float,QList<itemChars>*)));
@@ -244,6 +244,7 @@ void MainWindow::showEditWidget(int nid, QString nname, float nprice, int ncount
     ed->setWindowModality(Qt::WindowModal);
     editWidget = ed;
     ed->show();
+    ed->onLoad();
 
 
 }

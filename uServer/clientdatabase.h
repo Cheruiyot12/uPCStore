@@ -40,6 +40,7 @@ public slots:
     result getPermissions(QString login);
     result getCharNames(int itemTypeId);
     result editItem(int nnid, QString nnme, float nprce, QList<itemChars>* nchrs);
+    result addItem(int typeId, QString nnme, float nprice, QList<itemChars>* nchrs);
 private:
     QSqlDatabase mainDB;
 
