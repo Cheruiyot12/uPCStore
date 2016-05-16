@@ -21,11 +21,13 @@ public slots:
 private:
     QWebSocket* mainSocket;
     ClientDatabase* dataBase;
+    //ClientDatabase* rootBase;
     bool isLoggedIn = false;
 
     bool isDebug = true;
     void sendTextMes(QString msg);
     QByteArray handleError(int errCode);
+    QString login = "";
 private slots:
     void onTextMessage(QString msg);
     void onDisconnect();

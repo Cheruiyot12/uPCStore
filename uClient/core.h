@@ -43,14 +43,28 @@ public slots:
     void placeOrder();
     void onOrderPlaced(int id);
     void onPlaceOrder();
+
+    void onGetPermissions();
+    void onObtaintedPermissions(QString st);
+
+    void onItemSelectedToMod(int num);
+    void onCharsRequested();
+    void loadChrsToCurr(QList<itemChars> *ql, QJsonArray *arr);
+    void loadChNames(QList<chars> *ql);
+
+    void onSaveReq(openMode sMode, int nnid, QString nnme, float nprce, QList<itemChars>* nchrs);
 private:
     MainWindow* mw;
     LoginWidget* lw;
     Connector* con;
     QList<ItemGroup*> groupList;
+    QList<chars> *charsList;
+    ItemGroup* curGr;
     QList<Item*> items;
     Computer comp;
     int orderNumber = 0;
+    permissions permId = permissions::user;
+    int itemSelectedToModNum = -1;
 
 
 };

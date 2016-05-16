@@ -26,8 +26,12 @@ signals:
     void clearItms();
 
     void sendItemValuesToShow(QStringList*, QStringList*, QStringList*);
+    void sendItemValuesToEdit(QList<itemChars> *, QJsonArray *);
 
     void orderPlacedSig(int id);
+
+    void obtaintedPermsSig(QString perms);
+    void onCharNames(QList<chars> *);
 public slots:
     void connect2server(QUrl url);
     void sendTextMess(QString msg);

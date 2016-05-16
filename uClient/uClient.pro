@@ -20,7 +20,8 @@ SOURCES += main.cpp\
     itemgroup.cpp \
     item.cpp \
     computer.cpp \
-    iteminfowidget.cpp
+    iteminfowidget.cpp \
+    itemeditwidget.cpp
 
 HEADERS  += mainwindow.h \
     connector.h \
@@ -29,4 +30,5 @@ HEADERS  += mainwindow.h \
     itemgroup.h \
     item.h \
     computer.h \
-    iteminfowidget.h
+    iteminfowidget.h \
+    itemeditwidget.h

@@ -4,6 +4,9 @@
 #include <QObject>
 #include <QJsonObject>
 #include <QDebug>
+#include <QList>
+#include <QJsonArray>
+#include <../uServer/commands.h>
 
 class Item : public QObject
 {
@@ -15,6 +18,12 @@ public:
     QString getName(){return name;}
     double getPrice(){return price;}
 
+    void setName(QString name){this->name = name;}
+    void setPrice(double price){this->price = price;}
+    void addChars(QJsonArray* arr);
+    QList<itemChars> *getChars();
+    bool isChLoaded(){return charsLoaded;}
+
 signals:
 
 public slots:
@@ -24,6 +33,9 @@ private:
     int id;
     QString name;
     double price;
+    QList<itemChars> chars;
+    bool charsLoaded = false;
+
 };
 
 #endif // ITEM_H

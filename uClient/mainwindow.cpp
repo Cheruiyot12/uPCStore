@@ -6,6 +6,7 @@ MainWindow::MainWindow(QWidget *parent)
     QWidget* mainWid = new QWidget();
     mainWid->setMinimumSize(640, 480);
     this->setCentralWidget(mainWid);
+    this->setWindowTitle("Computer configurator by Alkor Shikyaro");
     QGridLayout* mainLay = new QGridLayout();
     mainWid->setLayout(mainLay);
 
@@ -45,6 +46,22 @@ MainWindow::MainWindow(QWidget *parent)
     //inftest->show();
     QPushButton* sendOrder = new QPushButton("Отправить заказ");
     flay->addWidget(sendOrder,1,0);
+
+    QMenuBar* mainMenuBar = new QMenuBar();
+    mainLay->setMenuBar(mainMenuBar);
+
+    QMenu* mainMenu = new QMenu("Главное", mainMenuBar);
+    mainMenuBar->addMenu(mainMenu);
+    QAction* ext = new QAction("Выход", mainMenu);
+    mainMenu->addAction(ext);
+    connect(ext, SIGNAL(triggered(bool)), this, SLOT(close()));
+
+    QMenu* adminMenu = new QMenu("Управление", mainMenuBar);
+    mainMenuBar->addMenu(adminMenu);
+    adminMenu->addAction("Запросить права", this, SLOT(requestPermissionsClicked()));
+
+    QMenu* aboutMenu = new QMenu("О программе", mainMenuBar);
+    mainMenuBar->addMenu(aboutMenu);
 
     connect(catBox, SIGNAL(currentIndexChanged(int)), this, SLOT(onGroupIndexChanged(int)));
     connect(mainList, SIGNAL(itemClicked(QListWidgetItem*)), this, SLOT(onItemClickedToAdd(QListWidgetItem*)));
@@ -119,12 +136,14 @@ void MainWindow::onItemClickedToAdd(QListWidgetItem *li)
 
 void MainWindow::showCompContextMenu(const QPoint &p)
 {
-    QPoint globalPos = compList->mapToGlobal(p);
-    QMenu compMenu;
-    compMenu.addAction("Показать информацию", this, SLOT(showInfoAboutItem()));
-    compMenu.addAction("Удалить из сборки", this, SLOT(deleteItemFromComp()));
+    if(!compList->selectedItems().empty()){
+        QPoint globalPos = compList->mapToGlobal(p);
+        QMenu compMenu;
+        compMenu.addAction("Показать информацию", this, SLOT(showInfoAboutItem()));
+        compMenu.addAction("Удалить из сборки", this, SLOT(deleteItemFromComp()));
 
-    compMenu.exec(globalPos);
+        compMenu.exec(globalPos);
+    }
 }
 
 void MainWindow::showInfoAboutItem()
@@ -134,18 +153,18 @@ void MainWindow::showInfoAboutItem()
 
 void MainWindow::procInfoAboutItem(QStringList* st1, QStringList* st2, QStringList* st3)
 {
-        ItemInfoWidget* inf = new ItemInfoWidget(st1, st2, st3);
-        inf->setAttribute(Qt::WA_DeleteOnClose);
-        inf->setWindowFlags(Qt::Dialog);
-        inf->setWindowModality(Qt::WindowModal);
-        inf->show();
+    ItemInfoWidget* inf = new ItemInfoWidget(st1, st2, st3);
+    inf->setAttribute(Qt::WA_DeleteOnClose);
+    inf->setWindowFlags(Qt::Dialog);
+    inf->setWindowModality(Qt::WindowModal);
+    inf->show();
 }
 
 void MainWindow::deleteItemFromComp()
 {
     //this->onItemDelComp(compList->selectedItems().at(0)->data(1000));
     //for(int i = 0; i < compList->selectedItems().size(); i++){
-        emit this->onItemClickedToDelSig(compList->selectedItems().at(0)->data(1000).toInt());
+    emit this->onItemClickedToDelSig(compList->selectedItems().at(0)->data(1000).toInt());
     //}
 }
 
@@ -163,10 +182,88 @@ void MainWindow::sendOrderClicked()
     warnMess.setText("Вы хотите отправить заказ?\nПосле отправки содержимое заказа нельзя будет изменить.");
     warnMess.setStandardButtons(QMessageBox::Cancel | QMessageBox::Ok);
     warnMess.setMinimumWidth(400);
-
+    //Unity3d is missing you
     int ret = warnMess.exec();
 
     if(QMessageBox::Ok == ret){
         emit this->onPlaceOrderSig();
     }
+}
+
+void MainWindow::requestPermissionsClicked()
+{
+    emit this->onRequestPermissionsSig();
+}
+
+void MainWindow::activateSellerMode()
+{
+    mainList->setContextMenuPolicy(Qt::CustomContextMenu);
+    connect(mainList, SIGNAL(customContextMenuRequested(QPoint)), this, SLOT(showMainContextMenu(QPoint)));
+}
+
+void MainWindow::showMainContextMenu(const QPoint &p)
+{
+    QPoint globalPos = mainList->mapToGlobal(p);
+    QMenu compMenu;
+    compMenu.addAction("Добавить товар", this, SLOT(addItemSel()));
+    if(!mainList->selectedItems().empty()){
+
+        compMenu.addAction("Изменить товар", this, SLOT(modItemSel()));
+        compMenu.addAction("Удалить товар", this, SLOT(delItemSel()));
+    }
+
+    compMenu.exec(globalPos);
+}
+
+void MainWindow::addItemSel()
+{
+
+}
+
+void MainWindow::modItemSel()
+{
+    if(!mainList->selectedItems().empty())
+        emit this->selectItemToMod(mainList->row(mainList->selectedItems().at(0)));
+}
+
+void MainWindow::delItemSel()
+{
+
+}
+
+void MainWindow::showEditWidget(int nid, QString nname, float nprice, int ncount, openMode mode)
+{
+    if(editWidget != nullptr)
+        delete editWidget;
+    ItemEditWidget* ed = new ItemEditWidget(nid, nname, nprice, ncount, openMode::editing, this);
+    connect(ed, SIGNAL(getChrs()), this, SLOT(onLoadChrsReq()));
+    connect(ed, SIGNAL(onSaveSig(openMode,int,QString,float,QList<itemChars>*)),
+            this, SLOT(onSavReq(openMode,int,QString,float,QList<itemChars>*)));
+    //ed->setAttribute(Qt::WA_DeleteOnClose);
+    ed->setWindowFlags(Qt::Dialog);
+    ed->setWindowModality(Qt::WindowModal);
+    editWidget = ed;
+    ed->show();
+
+
+}
+
+void MainWindow::onLoadChrsReq()
+{
+    emit this->onLoadChrsReqSig();
+}
+
+void MainWindow::loadChrsToCurrWid(QList<itemChars> *chr)
+{
+    editWidget->loadChrs(chr);
+}
+
+void MainWindow::loadChNamsToCurrWid(QList<chars >*chr)
+{
+    editWidget->loadChrsNam(chr);
+}
+
+void MainWindow::onSavReq(openMode sMode, int nnid, QString nnme, float nprce, QList<itemChars>* nchrs)
+{
+    emit this->onSaveReqSig(sMode, nnid, nnme, nprce, nchrs);
 }

@@ -29,3 +29,24 @@ void Item::fromJson(QJsonObject *json)
     //qDebug() << json->value("itemPrice") << "------------------------------";
     price = json->value("itemPrice").toDouble();
 }
+
+void Item::addChars(QJsonArray *arr)
+{
+    chars.clear();
+    if(!arr->empty()){
+        for(int i = 0 ; i < arr->count(); i++){
+            itemChars chr;
+            QJsonObject obj = arr->at(i).toObject();
+            chr.charname = obj["charName"].toString();
+            chr.charValue = obj["charValue"].toString();
+            chr.charUnits = obj["charUnits"].toString();
+            chars.append(chr);
+        }
+        charsLoaded = true;
+    }
+}
+
+QList<itemChars>* Item::getChars()
+{
+    return &chars;
+}

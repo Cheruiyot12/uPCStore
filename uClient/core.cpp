@@ -29,6 +29,14 @@ void Core::showInterface()
     connect(mw, SIGNAL(onShowInfoAboutItemSig(int)), this, SLOT(showInfo(int)));
     connect(mw, SIGNAL(onPlaceOrderSig()), this, SLOT(onPlaceOrder()));
     connect(con, SIGNAL(orderPlacedSig(int)), this, SLOT(onOrderPlaced(int)));
+    connect(mw, SIGNAL(onRequestPermissionsSig()), this, SLOT(onGetPermissions()));
+    connect(con, SIGNAL(obtaintedPermsSig(QString)), this, SLOT(onObtaintedPermissions(QString)));
+    connect(mw, SIGNAL(selectItemToMod(int)), this, SLOT(onItemSelectedToMod(int)));
+    connect(mw, SIGNAL(onLoadChrsReqSig()), this, SLOT(onCharsRequested()));
+    connect(con, SIGNAL(sendItemValuesToEdit(QList<itemChars>*, QJsonArray *)), this, SLOT(loadChrsToCurr(QList<itemChars>*, QJsonArray *)));
+    connect(con, SIGNAL(onCharNames(QList<chars>*)), this, SLOT(loadChNames(QList<chars>*)));
+    connect(mw, SIGNAL(onSaveReqSig(openMode,int,QString,float,QList<itemChars>*)),
+            this, SLOT(onSaveReq(openMode,int,QString,float,QList<itemChars>*)));
     lw->show();
 }
 
@@ -92,6 +100,7 @@ void Core::onCurrGrChanged(int ind)
     QJsonObject obj;
     obj["command"] = getItemsFromGroup;
     obj["groupId"] = groupList.at(ind)->getId();
+    curGr = groupList.at(ind);
 
     QJsonDocument doc(obj);
     con->sendTextMess(doc.toJson(QJsonDocument::Compact));
@@ -183,5 +192,102 @@ void Core::onPlaceOrder()
         }
     }else{
         mw->showErr("Нельзя отправить пустой заказ!");
+    }
+}
+
+void Core::onGetPermissions()
+{
+    QJsonObject obj;
+    obj["command"] = getPermissions;
+    QJsonDocument doc(obj);
+    con->sendTextMess(doc.toJson(QJsonDocument::Compact));
+}
+
+void Core::onObtaintedPermissions(QString st)
+{
+    if(permId != permissions::admin && permId != permissions::seller){
+        if(st == "admin"){
+            permId = permissions::admin;
+            mw->activateSellerMode();
+        } else if (st == "seller"){
+            permId = permissions::seller;
+            mw->activateSellerMode();
+        } else {
+            QMessageBox::warning(0,"Ошибка", "У вас нет прав для администрирования системы!");
+        }
+    }
+}
+
+void Core::onItemSelectedToMod(int num)
+{
+    itemSelectedToModNum = num;
+    Item* itm = items.at(num);
+    mw->showEditWidget(itm->getId(), itm->getName(), itm->getPrice(), 1, openMode::editing);
+}
+
+void Core::onCharsRequested()
+{
+    QJsonObject ob2;
+    ob2["command"] = getCharNames;
+    ob2["typeId"] = curGr->getId();
+
+    QJsonDocument doc2(ob2);
+    con->sendTextMess(doc2.toJson(QJsonDocument::Compact));
+
+    QJsonObject obj;
+    obj["command"] = getItemCharValues;
+    obj["type"] = valuesToEdit;
+    obj["itemId"] = items.at(itemSelectedToModNum)->getId();
+
+    QJsonDocument doc(obj);
+    con->sendTextMess(doc.toJson(QJsonDocument::Compact));
+
+
+}
+
+void Core::loadChrsToCurr(QList<itemChars> *ql,QJsonArray *arr)
+{
+    qDebug() << "lchtc";
+    items.at(itemSelectedToModNum)->addChars(arr);
+    mw->loadChrsToCurrWid(ql);
+}
+
+void Core::loadChNames(QList<chars> *ql)
+{
+    charsList = ql;
+    mw->loadChNamsToCurrWid(charsList);
+
+}
+
+void Core::onSaveReq(openMode sMode, int nnid, QString nnme, float nprce, QList<itemChars> *nchrs)
+{
+    QJsonObject obj;
+    QJsonArray chrs;
+    if(sMode == openMode::editing){
+        obj["command"] = editItem;
+        obj["itemId"] = items.at(itemSelectedToModNum)->getId();
+        obj["itemPrice"] = nprce;
+        obj["itemName"] = nnme;
+
+        for(int i = 0; i < nchrs->size(); i++){
+            QJsonObject ch;
+            int jjj = 0;
+            for(int j = 0; j < charsList->size(); j++){
+                if(nchrs->at(i).charname == charsList->at(j).charname){
+                    jjj = charsList->at(j).charId;
+                    break;
+                }
+            }
+            ch["charId"] = jjj;
+            ch["charValue"] = nchrs->at(i).charValue;
+            ch["charUnits"] = nchrs->at(i).charUnits;
+            chrs.append(ch);
+        }
+        QJsonDocument ard(chrs);
+        QString ss = ard.toJson(QJsonDocument::Compact);
+        obj["chars"] = ss;
+        QJsonDocument ob(obj);
+        con->sendTextMess(ob.toJson(QJsonDocument::Compact));
+
     }
 }

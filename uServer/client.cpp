@@ -4,6 +4,8 @@ Client::Client(QWebSocket* sock, QObject *parent) : QObject(parent), mainSocket(
 {
     connect(mainSocket, SIGNAL(textMessageReceived(QString)), this, SLOT(onTextMessage(QString)));
     connect(mainSocket, SIGNAL(disconnected()), this, SLOT(onDisconnect()));
+    //rootBase = new ClientDatabase();
+    //rootBase->auth("postgres","alkor"); //TODO
 }
 
 void Client::onTextMessage(QString msg)
@@ -25,8 +27,9 @@ void Client::onTextMessage(QString msg)
                 uData["command"] = successLogin;
                 QJsonDocument uDoc(uData);
                 this->sendTextMes(uDoc.toJson(QJsonDocument::Compact));
+                login = obj["login"].toString();
             }else{
-                qDebug() << "cant auth";
+                qDebug() << obj[login].toString() <<"cant auth";
             }
 
         } else {
@@ -115,6 +118,50 @@ void Client::onTextMessage(QString msg)
            }
         }
         break;
+    }
+    case getPermissions:
+    {
+        result rest;
+        rest = dataBase->getPermissions(login);
+        if(!rest.isError){
+            QJsonObject objct;
+            objct["command"] = getPermissions;
+            objct["permissions"] = rest.resStr;
+            QJsonDocument doct(objct);
+            this->sendTextMes(doct.toJson(QJsonDocument::Compact));
+        }else{
+            this->sendTextMes(handleError(rest.errorCode));
+        }
+        break;
+    }
+    case getCharNames:
+    {
+        result rest;
+        rest = dataBase->getCharNames(obj["typeId"].toInt());
+        if(!rest.isError){
+            QJsonObject objct;
+            objct["command"] = getCharNames;
+            objct["chars"] = rest.resStr;
+            QJsonDocument doct(objct);
+            this->sendTextMes(doct.toJson(QJsonDocument::Compact));
+        }else{
+            this->sendTextMes(handleError(rest.errorCode));
+        }
+        break;
+    }
+    case editItem:
+    {
+        QList<itemChars> *ql = new QList<itemChars>;
+        QJsonDocument itmDoc = QJsonDocument::fromJson(obj["chars"].toString().toUtf8());
+        QJsonArray arr = itmDoc.array();
+        for(int i = 0; i < arr.count(); i++){
+            itemChars it;
+            it.charId = arr.at(i).toObject().value("charId").toInt();
+            it.charValue = arr.at(i).toObject().value("charValue").toString();
+            it.charUnits = arr.at(i).toObject().value("charUnits").toString();
+            ql->append(it);
+        }
+        dataBase->editItem(obj["itemId"].toInt(), obj["itemName"].toString(), obj["itemPrice"].toDouble(), ql);
     }
     default:
         break;

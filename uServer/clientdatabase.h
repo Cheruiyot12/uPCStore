@@ -12,6 +12,8 @@
 #include <QJsonDocument>
 #include <QDebug>
 #include <QDataStream>
+#include "commands.h"
+
 
 struct result{
     bool isError = false;
@@ -35,6 +37,9 @@ public slots:
     result getCharsOfItem(int itemId);
     result placeOrder();
     result addItemToOrder(int orderId, int itemId, int itemCount);
+    result getPermissions(QString login);
+    result getCharNames(int itemTypeId);
+    result editItem(int nnid, QString nnme, float nprce, QList<itemChars>* nchrs);
 private:
     QSqlDatabase mainDB;
 

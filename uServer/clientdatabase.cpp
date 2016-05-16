@@ -142,3 +142,68 @@ result ClientDatabase::addItemToOrder(int orderId, int itemId, int itemCount)
     }
     return res;
 }
+
+result ClientDatabase::getPermissions(QString login)
+{
+    result res;
+    QSqlQuery query;
+    //query.prepare();
+    if (query.exec(QString("SELECT get_permissons('%1');").arg(login))){
+        query.last();
+        res.resStr = query.value(0).toString();
+    }else{
+        qDebug() << "failed on getPermissions";
+        qDebug() << query.lastError().databaseText();
+        res.isError = true;
+        res.errorCode = query.lastError().number();
+    }
+    return res;
+}
+
+result ClientDatabase::getCharNames(int itemTypeId)
+{
+    result res;
+    QSqlQuery query;
+    QJsonArray grpArr;
+
+    if(query.exec(QString("SELECT id_char, name_char FROM chars WHERE chars.id_item_owner_type = %1;").arg(itemTypeId))){
+        while(query.next()){
+            QJsonObject grp;
+            grp["charId"] = query.value(0).toInt();
+            grp["charName"] = query.value(1).toString();
+            grpArr.append(grp);
+
+        }
+        QJsonDocument doc(grpArr);
+        res.resStr = doc.toJson(QJsonDocument::Compact);
+    }else{
+        qDebug() << "failed on getCharNames";
+        qDebug() << query.lastError().databaseText();
+        res.isError = true;
+        res.errorCode = query.lastError().number();
+    }
+    return res;
+
+}
+
+result ClientDatabase::editItem(int nnid, QString nnme, float nprce, QList<itemChars> *nchrs)
+{
+    result res;
+    QSqlQuery query;
+
+    if(query.exec(QString(
+                          "UPDATE items SET name_item = '%1', price_item_usd = %2 WHERE id_item = %3;"
+                          "DELETE FROM char_text_values WHERE id_item = %3;").arg(nnme).arg(nprce).arg(nnid))){
+        for(int i = 0; i < nchrs->size(); i++){
+            if(!query.exec(QString("INSERT INTO char_text_values "
+                               "VALUES(%1, %2, '%3', '%4');").arg(nchrs->at(i).charId).arg(nnid).arg(nchrs->at(i).charValue).arg(nchrs->at(i).charUnits))){
+                qDebug() << "failed on addchars";
+                qDebug() << query.lastError().databaseText();
+                res.isError = true;
+                res.errorCode = query.lastError().number();
+            }
+
+        }
+    }
+    return res;
+}

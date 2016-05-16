@@ -18,7 +18,10 @@
 #include <QComboBox>
 #include <iteminfowidget.h>
 #include <QDebug>
-
+#include <QMenu>
+#include <QAction>
+#include <QMenuBar>
+#include <itemeditwidget.h>
 
 class MainWindow : public QMainWindow
 {
@@ -39,12 +42,20 @@ public slots:
     void onItemDelComp(int id);
     void procInfoAboutItem(QStringList *st1, QStringList *st2, QStringList *st3);
     void setPrice(double price);
+    void activateSellerMode();
+    void showEditWidget(int nid, QString nname, float nprice, int ncount, openMode mode);
+    void onLoadChrsReq();
+    void loadChrsToCurrWid(QList<itemChars>*);
+    void loadChNamsToCurrWid(QList<chars> *chr);
+    void onSavReq(openMode sMode, int nnid, QString nnme, float nprce, QList<itemChars> *nchrs);
 private:
     QComboBox* catBox;
     QListWidget* mainList;
     QListWidget* compList;
     ItemInfoWidget* infoWidget;
     QLabel* priceLabel;
+    ItemEditWidget* editWidget = nullptr;
+
 private slots:
     void onGroupIndexChanged(int ind);
     void onItemRowChanged(int row);
@@ -53,6 +64,12 @@ private slots:
     void showInfoAboutItem();
     void deleteItemFromComp();
     void sendOrderClicked();
+    void requestPermissionsClicked();
+    void showMainContextMenu(const QPoint &p);
+    void addItemSel();
+    void delItemSel();
+    void modItemSel();
+
 signals:
     void currentGroupChangedSig(int id);
     void currenrItemChangedSig(int id);
@@ -60,6 +77,10 @@ signals:
     void onItemClickedToDelSig(int id);
     void onShowInfoAboutItemSig(int id);
     void onPlaceOrderSig();
+    void onRequestPermissionsSig();
+    void selectItemToMod(int num);
+    void onLoadChrsReqSig();
+    void onSaveReqSig(openMode sMode, int nnid, QString nnme, float nprce, QList<itemChars>* nchrs);
 };
 
 #endif // MAINWINDOW_H
