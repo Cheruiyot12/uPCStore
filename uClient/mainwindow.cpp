@@ -56,7 +56,7 @@ MainWindow::MainWindow(QWidget *parent)
     mainMenu->addAction(ext);
     connect(ext, SIGNAL(triggered(bool)), this, SLOT(close()));
 
-    QMenu* adminMenu = new QMenu("Управление", mainMenuBar);
+    adminMenu = new QMenu("Управление", mainMenuBar);
     mainMenuBar->addMenu(adminMenu);
     adminMenu->addAction("Запросить права", this, SLOT(requestPermissionsClicked()));
 
@@ -268,4 +268,14 @@ void MainWindow::loadChNamsToCurrWid(QList<chars >*chr)
 void MainWindow::onSavReq(openMode sMode, int nnid, QString nnme, float nprce, QList<itemChars>* nchrs)
 {
     emit this->onSaveReqSig(sMode, nnid, nnme, nprce, nchrs);
+}
+
+void MainWindow::activateAdminMode()
+{
+    adminMenu->addAction("Управление пользователями", this, SLOT(openUserEdit()));
+}
+
+void MainWindow::openUserEdit()
+{
+    emit this->openUserEditSig();
 }

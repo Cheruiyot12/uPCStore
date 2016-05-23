@@ -141,6 +141,19 @@ void Connector::onTextMsg(QString msg)
         emit this->succDelItem();
         break;
     }
+    case reqUserList:
+    {
+        QJsonDocument usDoc;
+        QJsonArray userArr;
+        usDoc = QJsonDocument::fromJson(obj["users"].toString().toUtf8());
+        userArr = usDoc.array();
+        emit this->onUserList(&userArr);
+        break;
+    }
+    case succUserMod:
+    {
+        emit this->onSuccUserMod();
+    }
     default:
         break;
     }

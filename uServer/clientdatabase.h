@@ -42,6 +42,10 @@ public slots:
     result editItem(int nnid, QString nnme, float nprce, QList<itemChars>* nchrs);
     result addItem(int typeId, QString nnme, float nprice, QList<itemChars>* nchrs);
     result deleteItem(int itemId);
+    result getUserList();
+    result createUser(QString nlog, QString npass, QString nmail, QString nperms);
+    result deleteUser(int userId);
+    result modUser(int uId, QString umail, bool modpass, QString newPerm, QString pass);
 private:
     QSqlDatabase mainDB;
 

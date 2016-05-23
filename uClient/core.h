@@ -1,6 +1,7 @@
 #ifndef CORE_H
 #define CORE_H
 
+
 #include <QObject>
 #include <mainwindow.h>
 #include <loginwidget.h>
@@ -11,6 +12,7 @@
 #include <QJsonDocument>
 #include <QDebug>
 #include <computer.h>
+#include <userwidget.h>
 
 
 class Core : public QObject
@@ -38,6 +40,8 @@ public slots:
     void addItemToComp(int id);
     void delItemFromComp(int id);
 
+
+
     void showInfo(int id);
 
     void placeOrder();
@@ -56,6 +60,9 @@ public slots:
     void onDeleteItm(int ind);
 
     void onSuccDelIt();
+    void onReqUserList();
+    void onUserList(QJsonArray* arr);
+    void openUserW();
 private:
     MainWindow* mw;
     LoginWidget* lw;
@@ -68,6 +75,7 @@ private:
     int orderNumber = 0;
     permissions permId = permissions::user;
     int itemSelectedToModNum = -1;
+    UserWidget* uw;
 
 
 };

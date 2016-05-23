@@ -34,6 +34,9 @@ signals:
     void onCharNames(QList<chars> *);
 
     void succDelItem();
+
+    void onUserList(QJsonArray *arr);
+    void onSuccUserMod();
 public slots:
     void connect2server(QUrl url);
     void sendTextMess(QString msg);

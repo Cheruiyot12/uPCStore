@@ -48,6 +48,8 @@ public slots:
     void loadChrsToCurrWid(QList<itemChars>*);
     void loadChNamsToCurrWid(QList<chars> *chr);
     void onSavReq(openMode sMode, int nnid, QString nnme, float nprce, QList<itemChars> *nchrs);
+    void activateAdminMode();
+    void openUserEdit();
 private:
     QComboBox* catBox;
     QListWidget* mainList;
@@ -55,6 +57,7 @@ private:
     ItemInfoWidget* infoWidget;
     QLabel* priceLabel;
     ItemEditWidget* editWidget = nullptr;
+    QMenu* adminMenu;
 
 private slots:
     void onGroupIndexChanged(int ind);
@@ -82,6 +85,7 @@ signals:
     void onLoadChrsReqSig();
     void onSaveReqSig(openMode sMode, int nnid, QString nnme, float nprce, QList<itemChars>* nchrs);
     void deleteSelectedItem(int ind);
+    void openUserEditSig();
 };
 
 #endif // MAINWINDOW_H

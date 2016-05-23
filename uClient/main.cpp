@@ -2,8 +2,17 @@
 #include "core.h"
 #include <QApplication>
 #include <QStyleFactory>
+
 int main(int argc, char *argv[])
+
 {
+
+    QStringList paths = QCoreApplication::libraryPaths();
+    paths.append(".");
+    paths.append("platforms");
+    paths.append("imageformats");
+    QCoreApplication::setLibraryPaths(paths);
+
     QApplication a(argc, argv);
 
     qApp->setStyle(QStyleFactory::create("fusion"));

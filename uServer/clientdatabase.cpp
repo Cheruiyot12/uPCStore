@@ -191,6 +191,7 @@ result ClientDatabase::editItem(int nnid, QString nnme, float nprce, QList<itemC
     result res;
     QSqlQuery query;
 
+    mainDB.transaction();
     if(query.exec(QString(
                           "UPDATE items SET name_item = '%1', price_item_usd = %2 WHERE id_item = %3;"
                           "DELETE FROM char_text_values WHERE id_item = %3;").arg(nnme).arg(nprce).arg(nnid))){
@@ -204,6 +205,12 @@ result ClientDatabase::editItem(int nnid, QString nnme, float nprce, QList<itemC
             }
 
         }
+    } else {
+        mainDB.rollback();
+        qDebug() << "failed on edititem";
+        qDebug() << query.lastError().databaseText();
+        res.isError = true;
+        res.errorCode = query.lastError().number();
     }
     return res;
 }
@@ -213,6 +220,7 @@ result ClientDatabase::addItem(int typeId, QString nnme, float nprice, QList<ite
     result res;
     QSqlQuery query;
 
+    mainDB.transaction();
     if(query.exec(QString(
                           "INSERT INTO items(type_id_item, name_item, price_item_usd, count_in_storage_item) "
                       "VALUES(%1, '%2', %3, 1) "
@@ -228,7 +236,9 @@ result ClientDatabase::addItem(int typeId, QString nnme, float nprice, QList<ite
                 res.errorCode = query.lastError().number();
             }
         }
+        mainDB.commit();
     } else {
+        mainDB.rollback();
         qDebug() << "failed on additem";
         qDebug() << query.lastError().databaseText();
         res.isError = true;
@@ -242,11 +252,15 @@ result ClientDatabase::deleteItem(int itemId)
     result res;
     QSqlQuery query;
 
+    mainDB.transaction();
+
     if(query.exec(QString(
                           "DELETE FROM char_text_values WHERE id_item = %1; "
                       "DELETE FROM items WHERE id_item = %1; "
                       "DELETE FROM orders_items WHERE id_item = %1;").arg(itemId))){
+        mainDB.commit();
     } else {
+        mainDB.rollback();
         qDebug() << "failed on delitem";
         qDebug() << query.lastError().databaseText();
         res.isError = true;
@@ -254,4 +268,78 @@ result ClientDatabase::deleteItem(int itemId)
     }
     return res;
 
+}
+
+result ClientDatabase::getUserList()
+{
+    result res;
+    QSqlQuery query;
+    QJsonArray grpArr;
+
+    if(query.exec(QString("SELECT * FROM user_accounts ORDER BY id_user;"))){
+        while(query.next()){
+            QJsonObject grp;
+            grp["userId"] = query.value(0).toInt();
+            grp["userLogin"] = query.value(1).toString();
+            grp["userPermissions"] = query.value(2).toString();
+            grp["userEmail"] = query.value(3).toString();
+            grp["userPassword"] = query.value(4).toString();
+            grp["userRegdate"] = query.value(5).toDate().toString("dd:MM:yyyy");
+            grpArr.append(grp);
+
+        }
+        QJsonDocument doc(grpArr);
+        res.resStr = doc.toJson(QJsonDocument::Compact);
+    }else{
+        qDebug() << "failed on getCharNames";
+        qDebug() << query.lastError().databaseText();
+        res.isError = true;
+        res.errorCode = query.lastError().number();
+    }
+    return res;
+}
+
+result ClientDatabase::createUser(QString nlog, QString npass, QString nmail, QString nperms)
+{
+    result res;
+    QSqlQuery query;
+
+    if(query.exec(QString("SELECT create_user('%1', '%2', '%3', '%4');").arg(nlog).arg(npass).arg(nmail).arg(nperms))){
+    } else {
+        qDebug() << "failed on createUser";
+        qDebug() << query.lastError().databaseText();
+        res.isError = true;
+        res.errorCode = query.lastError().number();
+    }
+    return res;
+}
+
+result ClientDatabase::deleteUser(int userId)
+{
+    result res;
+    QSqlQuery query;
+
+    if(query.exec(QString("SELECT delete_user(%1);").arg(userId))){
+    } else {
+        qDebug() << "failed on deleteUser";
+        qDebug() << query.lastError().databaseText();
+        res.isError = true;
+        res.errorCode = query.lastError().number();
+    }
+    return res;
+}
+
+result ClientDatabase::modUser(int uId, QString umail, bool modpass, QString newPerm, QString pass  = "")
+{
+    result res;
+    QSqlQuery query;
+
+    if(query.exec(QString("SELECT mod_user(%1, '%2', '%3', '%4', '%5');").arg(uId).arg(umail).arg(modpass).arg(pass).arg(newPerm))){
+    } else {
+        qDebug() << "failed on modUser";
+        qDebug() << query.lastError().databaseText();
+        res.isError = true;
+        res.errorCode = query.lastError().number();
+    }
+    return res;
 }

@@ -19,6 +19,11 @@ static const int addItem = 13;
 static const int delItem = 14;
 static const int successDelItem = 15;
 static const int successAddItem = 16;
+static const int addUserC = 17;
+static const int modUserC = 18;
+static const int delUserc = 19;
+static const int succUserMod = 20;
+static const int reqUserList = 21;
 
 
 

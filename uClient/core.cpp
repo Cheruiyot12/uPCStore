@@ -211,6 +211,15 @@ void Core::onObtaintedPermissions(QString st)
         if(st == "admin"){
             permId = permissions::admin;
             mw->activateSellerMode();
+            mw->activateAdminMode();
+            uw = new UserWidget();
+            connect(con, SIGNAL(onUserList(QJsonArray*)), this, SLOT(onUserList(QJsonArray*)));
+            connect(con, SIGNAL(onSuccUserMod()), this, SLOT(onReqUserList()));
+            connect(mw, SIGNAL(openUserEditSig()), this, SLOT(openUserW()));
+            connect(uw, SIGNAL(addUser(QString)), con, SLOT(sendTextMess(QString)));
+            connect(uw, SIGNAL(modUser(QString)), con, SLOT(sendTextMess(QString)));
+            connect(uw, SIGNAL(delUser(QString)), con, SLOT(sendTextMess(QString)));
+            connect(uw, SIGNAL(requestUsers()), this, SLOT(onReqUserList()));
         } else if (st == "seller"){
             permId = permissions::seller;
             mw->activateSellerMode();
@@ -317,4 +326,23 @@ void Core::onDeleteItm(int ind)
 void Core::onSuccDelIt()
 {
     onCurrGrChanged(groupList.indexOf(curGr));
+}
+
+void Core::onReqUserList()
+{
+    QJsonObject obj;
+    obj["command"] = reqUserList;
+    QJsonDocument doc(obj);
+    con->sendTextMess(doc.toJson(QJsonDocument::Compact));
+}
+
+void Core::onUserList(QJsonArray *arr)
+{
+    uw->loadUsers(arr);
+}
+
+void Core::openUserW()
+{
+    uw->show();
+    onReqUserList();
 }

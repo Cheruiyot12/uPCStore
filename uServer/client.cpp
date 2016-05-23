@@ -201,6 +201,66 @@ void Client::onTextMessage(QString msg)
         }
         break;
     }
+    case reqUserList:
+    {
+        result res = dataBase->getUserList();
+        if(!res.isError){
+            QJsonObject objct;
+            objct["command"] = reqUserList;
+            objct["users"] = res.resStr;
+            QJsonDocument doct(objct);
+            this->sendTextMes(doct.toJson(QJsonDocument::Compact));
+        } else {
+            this->sendTextMes(handleError(res.errorCode));
+        }
+        break;
+    }
+    case addUserC:
+    {
+        result res = dataBase->createUser(obj["userLogin"].toString(),
+                obj["userPassword"].toString(),
+                obj["userEmail"].toString(),
+                obj["userPermissions"].toString());
+        if(!res.isError){
+            QJsonObject objct;
+            objct["command"] = succUserMod;
+            QJsonDocument doct(objct);
+            this->sendTextMes(doct.toJson(QJsonDocument::Compact));
+        } else {
+            this->sendTextMes(handleError(res.errorCode));
+        }
+        break;
+    }
+    case delUserc:
+    {
+        result res = dataBase->deleteUser(obj["userId"].toInt());
+        if(!res.isError){
+            QJsonObject objct;
+            objct["command"] = succUserMod;
+            QJsonDocument doct(objct);
+            this->sendTextMes(doct.toJson(QJsonDocument::Compact));
+        } else {
+            this->sendTextMes(handleError(res.errorCode));
+        }
+        break;
+    }
+    case modUserC:
+    {
+        result res = dataBase->modUser(obj["userId"].toInt(),
+                obj["userEmail"].toString(),
+                obj["modPass"].toBool(),
+                obj["userPermissions"].toString(),
+                obj["userPassword"].toString());
+        if(!res.isError){
+            QJsonObject objct;
+            objct["command"] = succUserMod;
+            QJsonDocument doct(objct);
+            this->sendTextMes(doct.toJson(QJsonDocument::Compact));
+        } else {
+            this->sendTextMes(handleError(res.errorCode));
+        }
+        break;
+    }
     default:
         break;
     }

@@ -21,7 +21,8 @@ SOURCES += main.cpp\
     item.cpp \
     computer.cpp \
     iteminfowidget.cpp \
-    itemeditwidget.cpp
+    itemeditwidget.cpp \
+    userwidget.cpp
 
 HEADERS  += mainwindow.h \
     connector.h \
@@ -31,4 +32,5 @@ HEADERS  += mainwindow.h \
     item.h \
     computer.h \
     iteminfowidget.h \
-    itemeditwidget.h
+    itemeditwidget.h \
+    userwidget.h

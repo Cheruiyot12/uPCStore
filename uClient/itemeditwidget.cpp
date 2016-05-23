@@ -142,14 +142,16 @@ void ItemEditWidget::onModC()
 void ItemEditWidget::onSave()
 {
     QList<itemChars> *ldedChrs = new QList<itemChars>();
-   // if(charsLoaded){
-        for(int i = 0; i < charTabWid->rowCount(); i++){
-            itemChars itmc;
-            itmc.charname = charTabWid->item(i,0)->text();
-            itmc.charUnits = charTabWid->item(i,2)->text();
-            itmc.charValue = charTabWid->item(i,1)->text();
-            ldedChrs->append(itmc);
-        }
+    // if(charsLoaded){
+    for(int i = 0; i < charTabWid->rowCount(); i++){
+        itemChars itmc;
+        itmc.charname = charTabWid->item(i,0)->text();
+        itmc.charUnits = charTabWid->item(i,2)->text();
+        itmc.charValue = charTabWid->item(i,1)->text();
+        ldedChrs->append(itmc);
+    }
     //}
     emit this->onSaveSig(mod, id, namel->text(), pricel->text().toFloat(), ldedChrs);
+    this->close();
+
 }

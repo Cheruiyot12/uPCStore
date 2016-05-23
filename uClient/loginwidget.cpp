@@ -18,6 +18,7 @@ LoginWidget::LoginWidget(QWidget *parent) : QWidget(parent)
     //logLine->setPalette(pal);
 
     passLine = new QLineEdit(this);
+    passLine->setEchoMode(QLineEdit::Password);
     ipLine = new QLineEdit(this);
     ipLine->setText("localhost");
     mainlay->addWidget(logLine, 0, 1);
