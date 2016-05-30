@@ -15,6 +15,7 @@ class Computer : public QObject
     Q_OBJECT
 public:
     explicit Computer(QObject *parent = 0);
+    QList<Item*> hardware;
 
 signals:
 
@@ -28,7 +29,7 @@ public slots:
     bool isEmpty(){return hardware.empty();}
 
 private:
-    QList<Item*> hardware;
+
     bool isBuild = false;
 
 

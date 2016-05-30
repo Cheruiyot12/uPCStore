@@ -22,6 +22,7 @@
 #include <QAction>
 #include <QMenuBar>
 #include <itemeditwidget.h>
+#include <QFileDialog>
 
 class MainWindow : public QMainWindow
 {
@@ -72,6 +73,7 @@ private slots:
     void addItemSel();
     void delItemSel();
     void modItemSel();
+    void onCrePrice();
 
 signals:
     void currentGroupChangedSig(int id);
@@ -86,6 +88,7 @@ signals:
     void onSaveReqSig(openMode sMode, int nnid, QString nnme, float nprce, QList<itemChars>* nchrs);
     void deleteSelectedItem(int ind);
     void openUserEditSig();
+    void crePriceSig(QString);
 };
 
 #endif // MAINWINDOW_H

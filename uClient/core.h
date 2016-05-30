@@ -13,6 +13,8 @@
 #include <QDebug>
 #include <computer.h>
 #include <userwidget.h>
+#include <xlsxdocument.h>
+#include "cryptor.h"
 
 
 class Core : public QObject
@@ -63,6 +65,8 @@ public slots:
     void onReqUserList();
     void onUserList(QJsonArray* arr);
     void openUserW();
+
+    void generatePrice(QString path);
 private:
     MainWindow* mw;
     LoginWidget* lw;

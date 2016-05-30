@@ -1,5 +1,6 @@
 #include "mainwindow.h"
 #include <QApplication>
+#include <openssl/applink.c>
 
 int main(int argc, char *argv[])
 {

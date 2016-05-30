@@ -6,6 +6,13 @@
 
 QT       += core gui network websockets
 QMAKE_CXXFLAGS += -std=c++0x
+LIBS += -LC:/OpenSSL-Win32/lib/MinGW -llibeay32
+LIBS += -LC:/OpenSSL-Win32/lib/MinGW -lssleay32
+
+INCLUDEPATH += C:/OpenSSL-Win32/include
+
+include(3rdparty/qtxlsx/xlsx/qtxlsx.pri)
+
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 
 TARGET = uClient
@@ -22,7 +29,8 @@ SOURCES += main.cpp\
     computer.cpp \
     iteminfowidget.cpp \
     itemeditwidget.cpp \
-    userwidget.cpp
+    userwidget.cpp \
+    cryptor.cpp
 
 HEADERS  += mainwindow.h \
     connector.h \
@@ -33,4 +41,5 @@ HEADERS  += mainwindow.h \
     computer.h \
     iteminfowidget.h \
     itemeditwidget.h \
-    userwidget.h
+    userwidget.h \
+    cryptor.h

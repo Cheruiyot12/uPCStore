@@ -53,6 +53,13 @@ struct itemChars{
     int itemId = -1;
 };
 
+enum messType {
+    connectMes,
+    rsaOpenkey,
+    aesKey,
+    data
+};
+
 struct chars{
     int charId = -1;
     QString charname = "";

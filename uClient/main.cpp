@@ -2,6 +2,7 @@
 #include "core.h"
 #include <QApplication>
 #include <QStyleFactory>
+#include <openssl/applink.c>
 
 int main(int argc, char *argv[])
 

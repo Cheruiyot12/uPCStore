@@ -112,11 +112,11 @@ result ClientDatabase::placeOrder()
 {
     result res;
     QSqlQuery query;
-    query.prepare(QString("INSERT INTO orders(id_customer, order_date) "
-                          "VALUES ((SELECT id_user FROM users WHERE users.login_user = quote_ident(USER)), now()) "
+    query.prepare(QString("INSERT INTO orders(id_customer, order_date, paid) "
+                          "VALUES ((SELECT id_user FROM users WHERE users.login_user = quote_ident(USER)), now(), 'false') "
                           "RETURNING id_order;"));
     if (query.exec()){
-        query.last();
+        query.first();
         res.resStr = QString("%1").arg(query.value(0).toInt());
     } else {
         qDebug() << "failed on placeOrder";

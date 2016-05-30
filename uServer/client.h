@@ -7,6 +7,7 @@
 #include <QJsonObject>
 #include <QJsonDocument>
 #include <commands.h>
+#include <cryptor.h>
 
 class Client : public QObject
 {
@@ -28,6 +29,9 @@ private:
     void sendTextMes(QString msg);
     QByteArray handleError(int errCode);
     QString login = "";
+    RSA* dec_rsa;
+    bool useAes = false;
+    QByteArray aesKey;
 private slots:
     void onTextMessage(QString msg);
     void onDisconnect();

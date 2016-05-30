@@ -5,8 +5,6 @@ Core::Core(QObject *parent) : QObject(parent)
     con = new Connector();
     mw = new MainWindow();
     lw = new LoginWidget();
-
-
 }
 
 void Core::showInterface()
@@ -39,7 +37,40 @@ void Core::showInterface()
             this, SLOT(onSaveReq(openMode,int,QString,float,QList<itemChars>*)));
     connect(mw, SIGNAL(deleteSelectedItem(int)), this, SLOT(onDeleteItm(int)));
     connect(con, SIGNAL(succDelItem()), this, SLOT(onSuccDelIt()));
+    connect(mw, SIGNAL(crePriceSig(QString)), this, SLOT(generatePrice(QString)));
     lw->show();
+    ///////////////////////////
+    ERR_load_crypto_strings();
+    OpenSSL_add_all_algorithms();
+    OPENSSL_config(NULL);
+
+    /*QString plain = "Hail Qtxzxzzzxx!";
+    QByteArray AesKey = Cryptor::genAesKey(256);
+    QByteArray AesIv = Cryptor::genAesKey(128);
+    //qDebug() << AesKey.toBase64();
+    //qDebug() << AesIv.toBase64();
+    QByteArray encr  = Cryptor::encryptAes(plain, AesKey, AesIv);
+    //qDebug() << encr.toBase64();
+    QString decr = Cryptor::decryptAes(QByteArray::fromBase64(encr.toBase64()), AesKey, AesIv);
+    qDebug() << decr;
+
+
+    /*RSA *dec_rsa;
+    RSA* enc_rsa;
+    dec_rsa = RSA_generate_key(2048, 3, NULL, NULL);
+    pubKey pkey = Cryptor::genpk(dec_rsa);
+    enc_rsa = Cryptor::constructEncrypt(pkey);
+    QByteArray enced = Cryptor::encr(plain, enc_rsa);
+    qDebug() << enced.toBase64();
+    QString dect = Cryptor::decr(QByteArray::fromBase64(enced.toBase64()), dec_rsa);
+    qDebug() << dect;
+    //EVP_cleanup();
+    //ERR_free_strings();*/
+    //////////////////////////////////////
+
+
+
+
 }
 
 void Core::logIn(QString log, QString pass)
@@ -345,4 +376,23 @@ void Core::openUserW()
 {
     uw->show();
     onReqUserList();
+}
+
+void Core::generatePrice(QString path)
+{
+    QXlsx::Document xlsx;
+
+    xlsx.write("A1", "Название");
+    xlsx.write("B1", "Цена");
+
+    int i = 0;
+    for(i = 0; i<comp.hardware.size(); i++){
+        xlsx.write(QString("A%1").arg(i+3), comp.hardware.at(i)->getName());
+        xlsx.write(QString("B%1").arg(i+3), comp.hardware.at(i)->getPrice());
+    }
+
+    xlsx.write(QString("A%1").arg(i+4), "Итого: ");
+    xlsx.write(QString("B%1").arg(i+4), comp.recountPrice());
+
+    xlsx.saveAs(path+"\\CompSave.xlsx");
 }

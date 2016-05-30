@@ -47,6 +47,10 @@ MainWindow::MainWindow(QWidget *parent)
     QPushButton* sendOrder = new QPushButton("Отправить заказ");
     flay->addWidget(sendOrder,1,0);
 
+    QPushButton *crePrice = new QPushButton("Создать отчет");
+    flay->addWidget(crePrice);
+    connect(crePrice, SIGNAL(clicked(bool)), this, SLOT(onCrePrice()));
+
     QMenuBar* mainMenuBar = new QMenuBar();
     mainLay->setMenuBar(mainMenuBar);
 
@@ -278,4 +282,12 @@ void MainWindow::activateAdminMode()
 void MainWindow::openUserEdit()
 {
     emit this->openUserEditSig();
+}
+
+void MainWindow::onCrePrice()
+{
+    if(!compList->count()==0){
+        QString filepath = QFileDialog::getExistingDirectory(this, "Выберите папку для сохранения", "C:\\");
+        emit this->crePriceSig(filepath);
+    }
 }
