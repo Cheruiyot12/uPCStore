@@ -29,3 +29,10 @@ HEADERS  += mainwindow.h \
     clientdatabase.h \
     commands.h \
     cryptor.h
+
+win32:CONFIG(release, debug|release): LIBS += -L$$OUT_PWD/../QACrypt/release/ -lQACrypt
+else:win32:CONFIG(debug, debug|release): LIBS += -L$$OUT_PWD/../QACrypt/debug/ -lQACrypt
+else:unix:!macx: LIBS += -L$$OUT_PWD/../QACrypt/ -lQACrypt
+
+INCLUDEPATH += $$PWD/../QACrypt
+DEPENDPATH += $$PWD/../QACrypt

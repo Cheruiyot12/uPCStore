@@ -15,6 +15,7 @@
 #include <QXmlStreamAttributes>
 #include <QMessageBox>
 #include <QDateTime>
+#include <cryptor.h>
 
 class Core : public QObject
 {

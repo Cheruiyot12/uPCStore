@@ -5,6 +5,7 @@ Core::Core(QObject *parent) : QObject(parent)
     con = new Connector();
     mw = new MainWindow();
     lw = new LoginWidget();
+    ordw = new orderWidget();
 }
 
 void Core::showInterface()
@@ -38,14 +39,16 @@ void Core::showInterface()
     connect(mw, SIGNAL(deleteSelectedItem(int)), this, SLOT(onDeleteItm(int)));
     connect(con, SIGNAL(succDelItem()), this, SLOT(onSuccDelIt()));
     connect(mw, SIGNAL(crePriceSig(QString)), this, SLOT(generatePrice(QString)));
+    connect(mw, SIGNAL(openOrderMenuSig()), this, SLOT(openOrdMenu()));
+    connect(con, SIGNAL(onOrderList(QJsonArray*)), this, SLOT(loadOrders(QJsonArray*)));
     lw->show();
     ///////////////////////////
-    ERR_load_crypto_strings();
-    OpenSSL_add_all_algorithms();
-    OPENSSL_config(NULL);
+    //ERR_load_crypto_strings();
+    //OpenSSL_add_all_algorithms();
+    //OPENSSL_config(NULL);
 
     /*QString plain = "Hail Qtxzxzzzxx!";
-    QByteArray AesKey = Cryptor::genAesKey(256);
+    QByteArray Aes/ey = Cryptor::genAesKey(256);
     QByteArray AesIv = Cryptor::genAesKey(128);
     //qDebug() << AesKey.toBase64();
     //qDebug() << AesIv.toBase64();
@@ -68,6 +71,14 @@ void Core::showInterface()
     //ERR_free_strings();*/
     //////////////////////////////////////
 
+    QByteArray key = QACrypt::genAesKey(256);
+    QByteArray iv = QACrypt::genAesKey(128);
+
+    qDebug() << "key: " << key.toBase64() << "\n iv: " << iv.toBase64();
+    QString str = "test plaintext ;3 \\ nya kawaii <3  ^^";
+    QByteArray enc = QACrypt::encrypt2(str.toUtf8(), key, iv);
+    qDebug() << enc.toBase64();
+    qDebug() << QString(QACrypt::decrypt2(enc, key, iv));
 
 
 
@@ -395,4 +406,17 @@ void Core::generatePrice(QString path)
     xlsx.write(QString("B%1").arg(i+4), comp.recountPrice());
 
     xlsx.saveAs(path+"\\CompSave.xlsx");
+}
+
+void Core::loadOrders(QJsonArray *arr)
+{
+    ordw->loadOrderNumbers(arr);
+}
+
+void Core::openOrdMenu()
+{
+    QJsonObject obj;
+    obj["command"] = reqOrderList;
+    QJsonDocument doc(obj);
+    con->sendTextMess(doc.toJson(QJsonDocument::Compact));
 }

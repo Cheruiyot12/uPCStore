@@ -51,6 +51,7 @@ public slots:
     void onSavReq(openMode sMode, int nnid, QString nnme, float nprce, QList<itemChars> *nchrs);
     void activateAdminMode();
     void openUserEdit();
+    void openOrderMenu();
 private:
     QComboBox* catBox;
     QListWidget* mainList;
@@ -89,6 +90,7 @@ signals:
     void deleteSelectedItem(int ind);
     void openUserEditSig();
     void crePriceSig(QString);
+    void openOrderMenuSig();
 };
 
 #endif // MAINWINDOW_H

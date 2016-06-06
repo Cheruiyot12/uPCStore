@@ -8,4 +8,5 @@ TEMPLATE = subdirs
 
 SUBDIRS += \
     uClient \
-    uServer
+    uServer \
+    QACrypt

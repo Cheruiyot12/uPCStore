@@ -26,6 +26,7 @@ class ClientDatabase : public QObject
     Q_OBJECT
 public:
     explicit ClientDatabase(QObject *parent = 0);
+    QSqlDatabase mainDB;
 
 signals:
 
@@ -46,8 +47,9 @@ public slots:
     result createUser(QString nlog, QString npass, QString nmail, QString nperms);
     result deleteUser(int userId);
     result modUser(int uId, QString umail, bool modpass, QString newPerm, QString pass);
+    result getInfoAboutOrders();
 private:
-    QSqlDatabase mainDB;
+
 
 };
 

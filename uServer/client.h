@@ -7,7 +7,7 @@
 #include <QJsonObject>
 #include <QJsonDocument>
 #include <commands.h>
-#include <cryptor.h>
+#include <../uServer/cryptor.h>
 
 class Client : public QObject
 {

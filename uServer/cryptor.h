@@ -11,6 +11,8 @@
 #include <openssl/err.h>
 #include <openssl/aes.h>
 #include <openssl/rsa.h>
+#include <openssl/pem.h>
+#include <openssl/bio.h>
 #include <string.h>
 #include <algorithm>
 #include <QCryptographicHash>
@@ -22,6 +24,9 @@ struct pubKey{
 
     char* e_b;
     int b_size;
+
+    QByteArray n_b_a;
+    QByteArray e_b_a;
 };
 
 
@@ -45,9 +50,9 @@ public slots:
     static QString decryptAes(QByteArray ciph, QByteArray kkey, QByteArray ivv);
     static QByteArray genAesKey(int kl);
 
-    static RSA *constructEncrypt(pubKey pk);
-    static QByteArray encr(QString inp, RSA* alg);
-    static QString decr(QByteArray cip, RSA* alg);
+    static void constructEncrypt(pubKey pk, RSA &enc_rs);
+    static QByteArray encr(QByteArray inp, RSA* alg);
+    static QByteArray decr(QByteArray cip, RSA* alg);
     static QByteArray decr_b(QByteArray cip, RSA* alg);
 
 

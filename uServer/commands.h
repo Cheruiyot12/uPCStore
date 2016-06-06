@@ -24,6 +24,7 @@ static const int modUserC = 18;
 static const int delUserc = 19;
 static const int succUserMod = 20;
 static const int reqUserList = 21;
+static const int reqOrderList = 22;
 
 
 
@@ -54,10 +55,11 @@ struct itemChars{
 };
 
 enum messType {
+    data,
     connectMes,
     rsaOpenkey,
     aesKey,
-    data
+
 };
 
 struct chars{

@@ -193,11 +193,11 @@ result ClientDatabase::editItem(int nnid, QString nnme, float nprce, QList<itemC
 
     mainDB.transaction();
     if(query.exec(QString(
-                          "UPDATE items SET name_item = '%1', price_item_usd = %2 WHERE id_item = %3;"
-                          "DELETE FROM char_text_values WHERE id_item = %3;").arg(nnme).arg(nprce).arg(nnid))){
+                      "UPDATE items SET name_item = '%1', price_item_usd = %2 WHERE id_item = %3;"
+                      "DELETE FROM char_text_values WHERE id_item = %3;").arg(nnme).arg(nprce).arg(nnid))){
         for(int i = 0; i < nchrs->size(); i++){
             if(!query.exec(QString("INSERT INTO char_text_values "
-                               "VALUES(%1, %2, '%3', '%4');").arg(nchrs->at(i).charId).arg(nnid).arg(nchrs->at(i).charValue).arg(nchrs->at(i).charUnits))){
+                                   "VALUES(%1, %2, '%3', '%4');").arg(nchrs->at(i).charId).arg(nnid).arg(nchrs->at(i).charValue).arg(nchrs->at(i).charUnits))){
                 qDebug() << "failed on addchars";
                 qDebug() << query.lastError().databaseText();
                 res.isError = true;
@@ -222,14 +222,14 @@ result ClientDatabase::addItem(int typeId, QString nnme, float nprice, QList<ite
 
     mainDB.transaction();
     if(query.exec(QString(
-                          "INSERT INTO items(type_id_item, name_item, price_item_usd, count_in_storage_item) "
+                      "INSERT INTO items(type_id_item, name_item, price_item_usd, count_in_storage_item) "
                       "VALUES(%1, '%2', %3, 1) "
                       "RETURNING id_item;").arg(typeId).arg(nnme).arg(nprice))){
         query.last();
         int nId = query.value(0).toInt();
         for(int i = 0; i < nchrs->size(); i++){
             if(!query.exec(QString("INSERT INTO char_text_values "
-                               "VALUES(%1, %2, '%3', '%4');").arg(nchrs->at(i).charId).arg(nId).arg(nchrs->at(i).charValue).arg(nchrs->at(i).charUnits))){
+                                   "VALUES(%1, %2, '%3', '%4');").arg(nchrs->at(i).charId).arg(nId).arg(nchrs->at(i).charValue).arg(nchrs->at(i).charUnits))){
                 qDebug() << "failed on addchars";
                 qDebug() << query.lastError().databaseText();
                 res.isError = true;
@@ -255,7 +255,7 @@ result ClientDatabase::deleteItem(int itemId)
     mainDB.transaction();
 
     if(query.exec(QString(
-                          "DELETE FROM char_text_values WHERE id_item = %1; "
+                      "DELETE FROM char_text_values WHERE id_item = %1; "
                       "DELETE FROM items WHERE id_item = %1; "
                       "DELETE FROM orders_items WHERE id_item = %1;").arg(itemId))){
         mainDB.commit();
@@ -337,6 +337,57 @@ result ClientDatabase::modUser(int uId, QString umail, bool modpass, QString new
     if(query.exec(QString("SELECT mod_user(%1, '%2', '%3', '%4', '%5');").arg(uId).arg(umail).arg(modpass).arg(pass).arg(newPerm))){
     } else {
         qDebug() << "failed on modUser";
+        qDebug() << query.lastError().databaseText();
+        res.isError = true;
+        res.errorCode = query.lastError().number();
+    }
+    return res;
+}
+
+result ClientDatabase::getInfoAboutOrders()
+{
+    result res;
+    QSqlQuery query;
+    QJsonArray arr;
+    QSqlQuery query2;
+
+    if (query.exec(QString("SELECT * FROM customer_orders WHERE login_user = user;"))){
+        while(query.next()){
+
+            QJsonObject grp;
+            grp["orderNum"] = query.value(1).toInt();
+            grp["orderDate"] = query.value(3).toDate().toString("dd:MM:yyyy");
+            grp["orderSum"] = query.value(4).toDouble();
+            grp["userName"] = query.value(6).toString();
+            grp["userSur"] = query.value(5).toString();
+            grp["userMid"] = query.value(7).toString();
+            //grp["itemArr"] = QJsonArray();
+            qDebug() << query.value(1).toInt();
+
+            if(query2.exec(QString("SELECT * FROM product_positions WHERE id_order = %1").arg(grp["orderNum"].toInt()))){
+                QJsonArray grrr;
+                while(query2.next()){
+                    QJsonObject grpp;
+                    grpp["itemName"] = query2.value(1).toString();
+                    grpp["itemSum"] = query2.value(3).toDouble();
+                    grpp["itemCount"] = query2.value(2).toInt();
+
+                    grrr.append(grpp);
+                }
+                grp["itemArr"] = grrr;
+                arr.append(grp);
+            } else {
+                qDebug() << "failed on getInfoOrdersItems";
+                qDebug() << query2.lastError().databaseText();
+                res.isError = true;
+                res.errorCode = query2.lastError().number();
+            }
+        }
+
+        QJsonDocument doc(arr);
+        res.resStr = doc.toJson(QJsonDocument::Compact);
+    } else {
+        qDebug() << "failed on getInfoOrders";
         qDebug() << query.lastError().databaseText();
         res.isError = true;
         res.errorCode = query.lastError().number();

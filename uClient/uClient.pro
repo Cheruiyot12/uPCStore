@@ -30,7 +30,7 @@ SOURCES += main.cpp\
     iteminfowidget.cpp \
     itemeditwidget.cpp \
     userwidget.cpp \
-    cryptor.cpp
+    orderwidget.cpp
 
 HEADERS  += mainwindow.h \
     connector.h \
@@ -42,4 +42,11 @@ HEADERS  += mainwindow.h \
     iteminfowidget.h \
     itemeditwidget.h \
     userwidget.h \
-    cryptor.h
+    orderwidget.h
+
+win32:CONFIG(release, debug|release): LIBS += -L$$OUT_PWD/../QACrypt/release/ -lQACrypt
+else:win32:CONFIG(debug, debug|release): LIBS += -L$$OUT_PWD/../QACrypt/debug/ -lQACrypt
+else:unix:!macx: LIBS += -L$$OUT_PWD/../QACrypt/ -lQACrypt
+
+INCLUDEPATH += $$PWD/../QACrypt
+DEPENDPATH += $$PWD/../QACrypt

@@ -14,7 +14,9 @@
 #include <computer.h>
 #include <userwidget.h>
 #include <xlsxdocument.h>
-#include "cryptor.h"
+//#include "cryptor.h"
+#include <qacrypt.h>
+#include <orderwidget.h>
 
 
 class Core : public QObject
@@ -67,6 +69,9 @@ public slots:
     void openUserW();
 
     void generatePrice(QString path);
+
+    void loadOrders(QJsonArray* arr);
+    void openOrdMenu();
 private:
     MainWindow* mw;
     LoginWidget* lw;
@@ -80,6 +85,8 @@ private:
     permissions permId = permissions::user;
     int itemSelectedToModNum = -1;
     UserWidget* uw;
+    orderWidget *ordw;
+
 
 
 };

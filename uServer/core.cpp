@@ -7,8 +7,23 @@ Core::Core(QObject *parent) : QObject(parent), server(new QWebSocketServer(QStri
     //generateConfig();
     readConfig();
     generateBat();
-    //backUpDb();
+    backUpDb();
     initServer(port);
+
+    /*ERR_load_crypto_strings();
+        OpenSSL_add_all_algorithms();
+        OPENSSL_config(NULL);
+
+    RSA *dec_rsa;
+    RSA *enc_rsa;
+    dec_rsa = RSA_generate_key(2048, 3, NULL, NULL);
+    pubKey pkey = Cryptor::genpk(dec_rsa);
+    Cryptor::constructEncrypt(pkey, *enc_rsa);
+    QString plain = "Plaintext";
+    QByteArray enced = Cryptor::encr(plain.toUtf8(), enc_rsa);
+    qDebug() << enced.toBase64();
+    QString dect = QString(Cryptor::decr(QByteArray::fromBase64(enced.toBase64()), dec_rsa));
+    qDebug() << dect;*/
 }
 
 void Core::initServer(quint16 port)
@@ -26,13 +41,16 @@ void Core::newConnection()
 {
     qDebug() << "new CLIENT!!!!!!!!!!!!!!!";
     Client* newCli = new Client(server->nextPendingConnection());
+    connect( newCli, SIGNAL(cliDisc(Client*)), this, SLOT(clientDisconnected(Client*)));
     cliList << newCli;
 }
 
 void Core::clientDisconnected(Client *cli)
 {
     qDebug() << "Client disconnected";
+
     cliList.removeAt(cliList.indexOf(cli));
+    delete cli;
 }
 
 void Core::generateBat()

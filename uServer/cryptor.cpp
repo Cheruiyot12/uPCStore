@@ -152,24 +152,29 @@ QByteArray Cryptor::genAesKey(int kl)
         return k;
 }
 
-RSA* Cryptor::constructEncrypt(pubKey pk)
+void Cryptor::constructEncrypt(pubKey pk, RSA& enc_rs)
 {
-    RSA* encrpt_rsa = RSA_new();
-    encrpt_rsa->n = BN_bin2bn((unsigned char*)pk.n_b, pk.n_size, NULL);
-    encrpt_rsa->e = BN_bin2bn((unsigned char*)pk.e_b, pk.b_size, NULL);
+    enc_rs.n = BN_bin2bn((unsigned char*)pk.n_b_a.data(), pk.n_size, NULL);
+    enc_rs.e = BN_bin2bn((unsigned char*)pk.e_b_a.data(), pk.b_size, NULL);
+    handleErrors();
 
-    return encrpt_rsa;
+    //return encrpt_rsa;
 
 }
 
-QByteArray Cryptor::encr(QString inp, RSA *alg)
+QByteArray Cryptor::encr(QByteArray inp, RSA *alg)
 {
-    char* encrypt_string = (char*) calloc(RSA_size(alg), sizeof(char));
+    char* encrypt_string = (char*) calloc(RSA_size(alg)-11, sizeof(char));
+    QByteArray encr;
+    encr.resize(RSA_size(alg));
     char plain[inp.size()];
     QByteArray arr = QByteArray::fromStdString(inp.toStdString());
-    strcpy(plain, arr.data());
-    int encrypt_size = RSA_public_encrypt(arr.size(), (unsigned char*)plain, (unsigned char*)encrypt_string, alg,
-                                          RSA_PKCS1_OAEP_PADDING);
+    strcpy(plain, inp.data());
+    handleErrors();
+    int encrypt_size = RSA_public_encrypt(inp.size()+1, (unsigned char*)plain, (unsigned char*)encrypt_string, alg,
+                                          RSA_PKCS1_PADDING);
+    handleErrors();
+    encr.resize(encrypt_size);
 
     QByteArray ret = QByteArray::fromRawData(encrypt_string, encrypt_size);
     return ret;
@@ -182,31 +187,41 @@ pubKey Cryptor::genpk(RSA *rsa){
 
     pubKey pk;
 
-    pk.n_b = (char*)calloc(RSA_size(rsa), sizeof(char));
-    pk.e_b = (char*)calloc(RSA_size(rsa), sizeof(char));
+    //pk.n_b = (char*)calloc(RSA_size(rsa), sizeof(char));
+    //pk.e_b = (char*)calloc(RSA_size(rsa), sizeof(char));
 
-    pk.n_size = BN_bn2bin(rsa->n, (unsigned char*)pk.n_b);
-    pk.b_size = BN_bn2bin(rsa->e, (unsigned char*)pk.e_b);
+    pk.n_b_a.resize(RSA_size(rsa));
+    pk.e_b_a.resize(RSA_size(rsa));
+
+    pk.n_size = BN_bn2bin(rsa->n, (unsigned char*)pk.n_b_a.data());
+    pk.b_size = BN_bn2bin(rsa->e, (unsigned char*)pk.e_b_a.data());
+    handleErrors();
+
+   // pk.n_b_a.resize(pk.n_size);
+   // pk.e_b_a.resize(pk.b_size);
 
     return pk;
 }
 
-QString Cryptor::decr(QByteArray cip, RSA *alg)
+QByteArray Cryptor::decr(QByteArray cip, RSA *alg)
 {
-    char* decrypt_string = (char*) calloc(RSA_size(alg), sizeof(char));
-    int decrypt_size = RSA_private_decrypt(cip.size(), (unsigned char*)cip.data(), (unsigned char*)decrypt_string,
-                                           alg, RSA_PKCS1_OAEP_PADDING);
+    //char* decrypt_string = (char*) calloc(RSA_size(alg), sizeof(char));
+    QByteArray decr;
+    decr.resize(RSA_size(alg));
+    int decrypt_size = RSA_private_decrypt(cip.size(), (unsigned char*)cip.data(), (unsigned char*)decr.data(),
+                                           alg, RSA_PKCS1_PADDING);
 
-    QByteArray arr = QByteArray::fromRawData(decrypt_string, decrypt_size);
+    //QByteArray arr = QByteArray::fromRawData(decrypt_string, decrypt_size);
+    decr.resize(decrypt_size);
 
-    return arr;
+    return decr;
 }
 
 QByteArray Cryptor::decr_b(QByteArray cip, RSA *alg)
 {
     char* decrypt_string = (char*) calloc(RSA_size(alg), sizeof(char));
     int decrypt_size = RSA_private_decrypt(cip.size(), (unsigned char*)cip.data(), (unsigned char*)decrypt_string,
-                                           alg, RSA_PKCS1_OAEP_PADDING);
+                                           alg, RSA_PKCS1_PADDING);
 
     char* er = new char[2048];
     ERR_error_string(ERR_get_error(), er);

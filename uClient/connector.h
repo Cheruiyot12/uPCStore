@@ -6,7 +6,7 @@
 #include <QWebSocket>
 #include <QDebug>
 #include <../uServer/commands.h>
-#include <cryptor.h>
+//#include <cryptor.h>
 
 class Connector : public QObject
 {
@@ -38,6 +38,8 @@ signals:
 
     void onUserList(QJsonArray *arr);
     void onSuccUserMod();
+
+    void onOrderList(QJsonArray *arr);
 public slots:
     void connect2server(QUrl url);
     void sendTextMess(QString msg);
@@ -51,7 +53,7 @@ private:
     QWebSocket cliSocket;
     bool connected = false;
     bool useAes = false;
-    RSA* enc_rsa;
+    //RSA* enc_rsa;
     QByteArray aesKey;
 
 

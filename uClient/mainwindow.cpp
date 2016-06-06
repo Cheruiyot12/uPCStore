@@ -64,8 +64,13 @@ MainWindow::MainWindow(QWidget *parent)
     mainMenuBar->addMenu(adminMenu);
     adminMenu->addAction("Запросить права", this, SLOT(requestPermissionsClicked()));
 
+    QMenu* orderMenu = new QMenu("Заказы", mainMenuBar);
+    mainMenuBar->addMenu(orderMenu);
+    orderMenu->addAction("Список заказов", this, SLOT(openOrderMenu()));
+
     QMenu* aboutMenu = new QMenu("О программе", mainMenuBar);
     mainMenuBar->addMenu(aboutMenu);
+
 
     connect(catBox, SIGNAL(currentIndexChanged(int)), this, SLOT(onGroupIndexChanged(int)));
     connect(mainList, SIGNAL(itemClicked(QListWidgetItem*)), this, SLOT(onItemClickedToAdd(QListWidgetItem*)));
@@ -290,4 +295,9 @@ void MainWindow::onCrePrice()
         QString filepath = QFileDialog::getExistingDirectory(this, "Выберите папку для сохранения", "C:\\");
         emit this->crePriceSig(filepath);
     }
+}
+
+void MainWindow::openOrderMenu()
+{
+    emit this->openOrderMenuSig();
 }

@@ -36,11 +36,13 @@ void Client::onTextMessage(QString msg)
         //Debug() << keyStr.toBase64();
         aesKey = keyr;
         qDebug() << " aes key:"<< aesKey.toBase64();
-        useAes = true;
+        //useAes = true;
 
     } else {
-        doc = QJsonDocument::fromJson(Cryptor::decryptAes(QByteArray::fromBase64(firObj["data"].toString().toLatin1()),
-                                      aesKey, QByteArray::fromBase64(firObj["iv"].toString().toLatin1())).toUtf8());
+        /*doc = QJsonDocument::fromJson(Cryptor::decryptAes(QByteArray::fromBase64(firObj["data"].toString().toLatin1()),
+                                      aesKey, QByteArray::fromBase64(firObj["iv"].toString().toLatin1())).toUtf8());*/
+
+        doc = QJsonDocument::fromJson(msg.toUtf8());
         QJsonObject obj = doc.object();
 
         switch (obj["command"].toInt()) {
@@ -288,6 +290,21 @@ void Client::onTextMessage(QString msg)
             }
             break;
         }
+        case reqOrderList:
+        {
+            result res = dataBase->getInfoAboutOrders();
+            if(!res.isError){
+                QJsonObject objct;
+                objct["command"] = reqOrderList;
+                objct["orders"] = res.resStr;
+                qDebug() << res.resStr;
+                QJsonDocument doct(objct);
+                this->sendTextMes(doct.toJson(QJsonDocument::Compact));
+            } else {
+                this->sendTextMes(handleError(res.errorCode));
+            }
+            break;
+        }
         default:
             break;
         }
@@ -317,6 +334,7 @@ QByteArray Client::handleError(int errCode)
 
 void Client::onDisconnect()
 {
+    dataBase->mainDB.close();
     emit this->cliDisc(this);
 }
 
