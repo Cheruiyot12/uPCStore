@@ -8,6 +8,7 @@
 #include <QJsonDocument>
 #include <commands.h>
 #include <../uServer/cryptor.h>
+#include <qacrypt.h>
 
 class Client : public QObject
 {
@@ -32,6 +33,9 @@ private:
     RSA* dec_rsa;
     bool useAes = false;
     QByteArray aesKey;
+    DH* myPrivKey;
+    QByteArray* clientPubKey;
+    QByteArray* aes256key;
 private slots:
     void onTextMessage(QString msg);
     void onDisconnect();

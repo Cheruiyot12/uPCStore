@@ -6,9 +6,6 @@ Connector::Connector(QObject *parent) : QObject(parent)
     connect(&cliSocket, SIGNAL(disconnected()), this, SLOT(onDisconnected()));
     connect(&cliSocket, SIGNAL(textMessageReceived(QString)), this, SLOT(onTextMsg(QString)));
 
-    //ERR_load_crypto_strings();
-    //OpenSSL_add_all_algorithms();
-    //OPENSSL_config(NULL);
 }
 
 void Connector::onConnected()
@@ -20,7 +17,7 @@ void Connector::onConnected()
     uData["type"] = messType::connectMes;
     QJsonDocument uDoc(uData);
 
-    //sendTextMess(uDoc.toJson(QJsonDocument::Compact));
+    sendTextMess(uDoc.toJson(QJsonDocument::Compact));
 }
 
 void Connector::onDisconnected()
@@ -44,34 +41,62 @@ void Connector::onTextMsg(QString msg)
     QJsonDocument firDoc = QJsonDocument::fromJson(msg.toUtf8());
     QJsonObject firObj = firDoc.object();
 
-    /*if(firObj["type"].toInt() == messType::rsaOpenkey){
-        pubKey pkey;
-        strcpy(pkey.n_b, (char*)firObj["n_b"].toVariant().data());
-        strcpy(pkey.e_b, (char*)firObj["e_b"].toVariant().data());
-        pkey.n_size = firObj["n_size"].toInt();
-        pkey.b_size = firObj["b_size"].toInt();
-        enc_rsa = Cryptor::constructEncrypt(pkey);
-        aesKey = Cryptor::genAesKey(256);
+    if(firObj["type"].toInt() == messType::rsaOpenkey){
+        int codes;
 
-        qDebug() << " aes key:"<< aesKey.toBase64();
+        myPrivKey = DH_new();
 
-        QByteArray encrKe = Cryptor::encr(aesKey, enc_rsa);
+        myPrivKey->p = BN_new();
+        myPrivKey->g = BN_new();
+        QByteArray pA = QByteArray::fromBase64(firObj["p"].toString().toLatin1());
+        QByteArray gA = QByteArray::fromBase64(firObj["g"].toString().toLatin1());
+        QACrypt::binArr2bn(QByteArray::fromBase64(firObj["p"].toString().toLatin1()), &myPrivKey->p);
+        QACrypt::binArr2bn(QByteArray::fromBase64(firObj["g"].toString().toLatin1()), &myPrivKey->g);
+        //BN_bin2bn((unsigned char*)pA.constData(), pA.size(), myPrivKey->p);
+        //BN_bin2bn((unsigned char*)gA.constData(), gA.size(), myPrivKey->g);
+
+        DH_check(myPrivKey, &codes);
+        if(codes!=0){
+            qDebug() << "DH check failed";
+            abort();
+        }
+
+        DH_generate_key(myPrivKey);
+
+        BIGNUM *pubKey = BN_new();
+        //QByteArray pubbK = QByteArray::fromBase64(firObj["pubKey"].toString().toLatin1());
+        //BN_bin2bn((unsigned char*)pubbK.constData(), pubbK.size(), pubKey);
+        QACrypt::binArr2bn(QByteArray::fromBase64(firObj["pubKey"].toString().toLatin1()), &pubKey);
+        qDebug() << "DH pubkey recieved!";
+
+        unsigned char* sharedSecret = new unsigned char[1024];
+        int keyLen = DH_compute_key(sharedSecret, pubKey, myPrivKey);
+        if(keyLen == -1){
+            ERR_print_errors_fp(stderr);
+        }
+
+        QByteArray keyArr = QByteArray::fromRawData((char*)sharedSecret, keyLen);
+
+        //qDebug() << "sharedSecret: " << keyArr.toBase64();
 
         QJsonObject uData;
-        uData["type"] = messType::aesKey;
-        uData["key"] = QString::fromLatin1(aesKey.toBase64());
+        uData["type"] = messType::rsaOpenkey;
+        uData["pubKey"] = QString(QACrypt::bn2binArr(myPrivKey->pub_key).toBase64());
         QJsonDocument uDoc(uData);
 
         sendTextMess(uDoc.toJson(QJsonDocument::Compact));
-        //useAes = true;
 
-
+        aesKey = keyArr;
+        useAes = true;
     } else if(firObj["type"].toInt() == messType::aesKey){
 
     } else {
-        /*doc = QJsonDocument::fromJson(Cryptor::decryptAes(QByteArray::fromBase64(firObj["data"].toString().toLatin1()),
-                                      aesKey, QByteArray::fromBase64(firObj["iv"].toString().toLatin1())).toUtf8());*/
-        doc = QJsonDocument::fromJson(msg.toUtf8());
+        if(useAes){
+        doc = QJsonDocument::fromJson(QACrypt::decrypt2(QByteArray::fromBase64(firObj["data"].toString().toLatin1()),
+                                      aesKey, QByteArray::fromBase64(firObj["iv"].toString().toLatin1())));
+        } else {
+            doc = QJsonDocument::fromJson(msg.toUtf8());
+        }
         QJsonObject obj = doc.object();
 
         switch (obj["command"].toInt()) {
@@ -208,7 +233,7 @@ void Connector::onTextMsg(QString msg)
             break;
         }
     }
-//}
+}
 
 void Connector::onBinMsg(QByteArray msg)
 {
@@ -219,10 +244,10 @@ void Connector::sendTextMess(QString msg)
 {
     if(useAes){
         QJsonObject obj;
-        //QByteArray iv = Cryptor::genAesKey(128);
-        //["type"] = messType::data;
-        //obj["data"] = QString::fromLatin1(Cryptor::encryptAes(msg, aesKey, iv).toBase64());
-        //obj["iv"] = QString::fromLatin1(iv.toBase64());
+        QByteArray iv = QACrypt::genAesKey(128);
+        obj["type"] = messType::data;
+        obj["data"] = QString::fromLatin1(QACrypt::encrypt2(msg.toUtf8(), aesKey, iv).toBase64());
+        obj["iv"] = QString::fromLatin1(iv.toBase64());
         QJsonDocument doc(obj);
         cliSocket.sendTextMessage(doc.toJson(QJsonDocument::Compact));
     } else

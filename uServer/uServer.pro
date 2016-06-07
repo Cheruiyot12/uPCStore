@@ -20,15 +20,13 @@ SOURCES += main.cpp\
         mainwindow.cpp \
     core.cpp \
     client.cpp \
-    clientdatabase.cpp \
-    cryptor.cpp
+    clientdatabase.cpp
 
 HEADERS  += mainwindow.h \
     core.h \
     client.h \
     clientdatabase.h \
-    commands.h \
-    cryptor.h
+    commands.h
 
 win32:CONFIG(release, debug|release): LIBS += -L$$OUT_PWD/../QACrypt/release/ -lQACrypt
 else:win32:CONFIG(debug, debug|release): LIBS += -L$$OUT_PWD/../QACrypt/debug/ -lQACrypt

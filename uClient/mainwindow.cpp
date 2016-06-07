@@ -162,11 +162,16 @@ void MainWindow::showInfoAboutItem()
 
 void MainWindow::procInfoAboutItem(QStringList* st1, QStringList* st2, QStringList* st3)
 {
+
     ItemInfoWidget* inf = new ItemInfoWidget(st1, st2, st3);
     inf->setAttribute(Qt::WA_DeleteOnClose);
     inf->setWindowFlags(Qt::Dialog);
     inf->setWindowModality(Qt::WindowModal);
-    inf->show();
+    if(!st1->empty()){
+        inf->show();
+    } else {
+        inf->close();
+    }
 }
 
 void MainWindow::deleteItemFromComp()

@@ -16,6 +16,8 @@
 #include <QMessageBox>
 #include <QDateTime>
 #include <cryptor.h>
+#include <qacrypt.h>
+#include <openssl/dh.h>
 
 class Core : public QObject
 {

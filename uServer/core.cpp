@@ -10,20 +10,73 @@ Core::Core(QObject *parent) : QObject(parent), server(new QWebSocketServer(QStri
     backUpDb();
     initServer(port);
 
-    /*ERR_load_crypto_strings();
-        OpenSSL_add_all_algorithms();
-        OPENSSL_config(NULL);
+    /*DH* privkey;
+    int codes;
+    int secret_size;
 
-    RSA *dec_rsa;
-    RSA *enc_rsa;
-    dec_rsa = RSA_generate_key(2048, 3, NULL, NULL);
-    pubKey pkey = Cryptor::genpk(dec_rsa);
-    Cryptor::constructEncrypt(pkey, *enc_rsa);
-    QString plain = "Plaintext";
-    QByteArray enced = Cryptor::encr(plain.toUtf8(), enc_rsa);
-    qDebug() << enced.toBase64();
-    QString dect = QString(Cryptor::decr(QByteArray::fromBase64(enced.toBase64()), dec_rsa));
-    qDebug() << dect;*/
+    privkey = DH_new();
+    DH_generate_parameters_ex(privkey, 512, DH_GENERATOR_2, NULL);
+
+    DH_check(privkey, &codes);
+    if(codes!=0){
+        qDebug() << "DH check failed";
+        abort();
+    }
+    DH_generate_key(privkey);
+    //BN_bn2bin()
+
+    DH* pubkey;
+    int pubcodes;
+    int secret_size_pub;
+
+    pubkey = DH_new();
+
+    //Bin2Bn
+    QByteArray privP, privG;
+    privP.resize(BN_num_bytes(privkey->p));
+    privG.resize(BN_num_bytes(privkey->g));
+    BN_bn2bin(privkey->p, (unsigned char*)privP.data());
+    BN_bn2bin(privkey->g, (unsigned char*)privG.data());
+    //Bin2Bn
+
+    //Bn2Bin
+    pubkey->p = BN_new();
+    BN_bin2bn((unsigned char*)privP.constData(), privP.length(), pubkey->p);
+    //Bn2Bin
+
+    pubkey->g = BN_new();
+    BN_bin2bn((unsigned char*)privG.constData(), privG.length(), pubkey->g);
+    //pubkey->g = privkey->g;
+
+
+    DH_check(pubkey, &pubcodes);
+    if(pubcodes!=0){
+        qDebug() << "DH check failed";
+        abort();
+    }
+
+    DH_generate_key(pubkey);
+
+    unsigned char* shared_sec1 = new unsigned char[1024];
+    unsigned char* shared_sec2 = new unsigned char[1024];
+
+    secret_size = DH_compute_key(shared_sec1, pubkey->pub_key, privkey);
+    secret_size_pub = DH_compute_key(shared_sec2, privkey->pub_key, pubkey);
+
+
+    //qDebug() << strcmp((char*)shared_sec1, (char*)shared_sec2);
+
+    //printf("%s", (char*)shared_sec1);
+    //printf("%s", (char*)shared_sec2);
+    //QByteArray sh1 = QByteArray::fromRawData((char*)shared_sec1, secret_size);
+    //QByteArray sh2 = QByteArray::fromRawData((char*)shared_sec2, secret_size_pub);
+
+
+    //qDebug() << sh1.toBase64();
+    //qDebug() << sh2.toBase64();
+*/
+
+
 }
 
 void Core::initServer(quint16 port)

@@ -27,7 +27,7 @@ QByteArray QACrypt::encrypt2(const QByteArray &data, const QByteArray &password,
     QByteArray dataBuff;dataBuff.resize(data.size()+AES_BLOCK_SIZE);
     EVP_CIPHER_CTX evpCipherCtx;
     EVP_CIPHER_CTX_init(&evpCipherCtx);
-    EVP_EncryptInit(&evpCipherCtx,EVP_aes_256_cbc(),(const unsigned char*)sha256(password).data(),(const unsigned char*)sha256("AEScrypt"+iv).data());
+    EVP_EncryptInit(&evpCipherCtx,EVP_aes_256_cbc(),(const unsigned char*)sha256(password).data(),(const unsigned char*)sha256(iv).data());
     EVP_EncryptUpdate(&evpCipherCtx,(unsigned char*)dataBuff.data(),&outLen,(const unsigned char*)data.data(),data.size());
     int tempLen=outLen;
     EVP_EncryptFinal(&evpCipherCtx,(unsigned char*)dataBuff.data()+tempLen,&outLen);
@@ -43,7 +43,7 @@ QByteArray QACrypt::decrypt2(const QByteArray &data, const QByteArray &password,
     QByteArray dataBuff;dataBuff.resize(data.size()+AES_BLOCK_SIZE);
     EVP_CIPHER_CTX evpCipherCtx;
     EVP_CIPHER_CTX_init(&evpCipherCtx);
-    EVP_DecryptInit(&evpCipherCtx,EVP_aes_256_cbc(),(const unsigned char*)sha256(password).data(),(const unsigned char*)sha256("AEScrypt"+iv).data());
+    EVP_DecryptInit(&evpCipherCtx,EVP_aes_256_cbc(),(const unsigned char*)sha256(password).data(),(const unsigned char*)sha256(iv).data());
     EVP_DecryptUpdate(&evpCipherCtx,(unsigned char*)dataBuff.data(),&outLen,(const unsigned char*)data.data(),data.size());
     int tempLen=outLen;
     EVP_DecryptFinal(&evpCipherCtx,(unsigned char*)dataBuff.data()+tempLen,&outLen);
@@ -60,4 +60,17 @@ QByteArray QACrypt::genAesKey(int kl)
         k.resize(kll);
         RAND_bytes((unsigned char*)k.data(), kll);
         return k;
+}
+
+QByteArray QACrypt::bn2binArr(const BIGNUM *num)
+{
+    QByteArray ret;
+    ret.resize(BN_num_bytes(num));
+    BN_bn2bin(num, (uchar*) ret.data());
+    return ret;
+}
+
+bool QACrypt::binArr2bn(const QByteArray &arr, BIGNUM **num)
+{
+    return BN_bin2bn((uchar*) arr.data(), arr.length(), *num) != 0;
 }

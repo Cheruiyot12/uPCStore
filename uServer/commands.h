@@ -58,7 +58,7 @@ enum messType {
     data,
     connectMes,
     rsaOpenkey,
-    aesKey,
+    aesKey
 
 };
 

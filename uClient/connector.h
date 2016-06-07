@@ -6,6 +6,8 @@
 #include <QWebSocket>
 #include <QDebug>
 #include <../uServer/commands.h>
+#include <qacrypt.h>
+#include <openssl/err.h>
 //#include <cryptor.h>
 
 class Connector : public QObject
@@ -55,6 +57,9 @@ private:
     bool useAes = false;
     //RSA* enc_rsa;
     QByteArray aesKey;
+    DH* myPrivKey;
+    QByteArray serverOpenKey;
+    //QByteArray aesKey;
 
 
 };
