@@ -27,8 +27,10 @@ LoginWidget::LoginWidget(QWidget *parent) : QWidget(parent)
 
     logIn = new QPushButton("Log In", this);
     mainlay->addWidget(logIn,3,0);
-    QPushButton* conn = new QPushButton("Connect", this);
+    conn = new QPushButton("Connect", this);
     mainlay->addWidget(conn,3,1);
+
+    logIn->setDisabled(true);
 
     connect(conn, SIGNAL(clicked(bool)), this, SLOT(onConnect()));
     connect(logIn, SIGNAL(clicked(bool)), this, SLOT(onLogin()));
@@ -44,4 +46,11 @@ void LoginWidget::onConnect()
 {
     QString qst = QString("ws://%1:6969").arg(ipLine->text());
     emit this->connectSig(QUrl(qst));
+    conn->setDisabled(true);
+}
+
+void LoginWidget::enableLogin()
+{
+    logIn->setDisabled(false);
+    QMessageBox::information(this, "Защищенное соединение установлено", "Теперь вы можете войти в систему");
 }

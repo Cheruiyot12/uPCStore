@@ -58,15 +58,45 @@ result ClientDatabase::getItemsFromGroup(int grId)
 {
     result res;
     QSqlQuery query;
+    QSqlQuery qu2;
     QJsonArray itemArr;
     query.prepare(QString("SELECT id_item,  name_item, price_item_usd FROM items WHERE type_id_item = %1").arg(grId));
     if(query.exec()){
         while (query.next()){
+            QJsonArray ar;
+            QJsonArray ar2;
             QJsonObject grp;
             grp["itemId"] = query.value(0).toInt();
             grp["itemName"] = query.value(1).toString();
             grp["itemPrice"] = query.value(2).toDouble();
             //qDebug() << query.value(2) << "--------------------------";
+            if(qu2.exec(QString("SELECT id_char1, text_chars.value, id_char2 "
+                     "FROM chars_link_info INNER JOIN text_chars ON id_char1 = id_char "
+                     "WHERE id_item = %1").arg(query.value(0).toInt()))){
+                while (qu2.next()){
+                    QJsonObject lnk;
+                    lnk["idChar1"] = qu2.value(0).toInt();
+                    lnk["value"] = qu2.value(1).toString();
+                    lnk["idChar2"] = qu2.value(2).toInt();
+                    ar.append(lnk);
+                }
+            }
+            QJsonDocument dct(ar);
+            grp["fromLinks"] = QString(dct.toJson(QJsonDocument::Compact));
+            if(qu2.exec(QString("SELECT id_char2, text_chars.value, id_char1 "
+                     "FROM chars_link_info INNER JOIN text_chars ON id_char2 = id_char "
+                     "WHERE id_item = %1").arg(query.value(0).toInt()))){
+                while (qu2.next()){
+                    QJsonObject lnk;
+                    lnk["idChar1"] = qu2.value(0).toInt();
+                    lnk["value"] = qu2.value(1).toString();
+                    lnk["idChar2"] = qu2.value(2).toInt();
+                    ar2.append(lnk);
+                }
+            }
+            QJsonDocument dct2(ar2);
+            grp["toLinks"] = QString(dct2.toJson(QJsonDocument::Compact));
+            //grp["toLinks"] = ar2;
             itemArr.append(grp);
         }
         QJsonDocument doc(itemArr);
@@ -205,6 +235,7 @@ result ClientDatabase::editItem(int nnid, QString nnme, float nprce, QList<itemC
             }
 
         }
+        mainDB.commit();
     } else {
         mainDB.rollback();
         qDebug() << "failed on edititem";
@@ -212,6 +243,7 @@ result ClientDatabase::editItem(int nnid, QString nnme, float nprce, QList<itemC
         res.isError = true;
         res.errorCode = query.lastError().number();
     }
+
     return res;
 }
 
@@ -393,4 +425,37 @@ result ClientDatabase::getInfoAboutOrders()
         res.errorCode = query.lastError().number();
     }
     return res;
+}
+
+result ClientDatabase::getLinkedChars()
+{
+    result res;
+    QSqlQuery query;
+    QJsonArray arr;
+
+    if(query.exec(QString("SELECT * FROM chars_link_info;"))){
+        while(query.next()){
+            QJsonObject grp;
+            grp["charId1"] = query.value(0).toInt();
+            grp["typeId1"] = query.value(1).toInt();
+            grp["typeName1"] = query.value(2).toString();
+            grp["charName1"] = query.value(3).toString();
+            grp["charId2"] = query.value(4).toInt();
+            grp["typeId2"] = query.value(5).toInt();
+            grp["typeName2"] = query.value(6).toString();
+            grp["charName2"] = query.value(7).toString();
+            arr.append(grp);
+
+        }
+        QJsonDocument doc(arr);
+        res.resStr = doc.toJson(QJsonDocument::Compact);
+    }else{
+        qDebug() << "failed on getLinkedChars";
+        qDebug() << query.lastError().databaseText();
+        res.isError = true;
+        res.errorCode = query.lastError().number();
+    }
+    return res;
+
+
 }

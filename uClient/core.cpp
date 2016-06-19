@@ -41,47 +41,18 @@ void Core::showInterface()
     connect(mw, SIGNAL(crePriceSig(QString)), this, SLOT(generatePrice(QString)));
     connect(mw, SIGNAL(openOrderMenuSig()), this, SLOT(openOrdMenu()));
     connect(con, SIGNAL(onOrderList(QJsonArray*)), this, SLOT(loadOrders(QJsonArray*)));
+    connect(con, SIGNAL(enableLogin()), lw, SLOT(enableLogin()));
+    connect(mw->ComBox, SIGNAL(clicked(bool)), this, SLOT(scp(bool)));
     lw->show();
-    ///////////////////////////
-    //ERR_load_crypto_strings();
-    //OpenSSL_add_all_algorithms();
-    //OPENSSL_config(NULL);
-
-    /*QString plain = "Hail Qtxzxzzzxx!";
-    QByteArray Aes/ey = Cryptor::genAesKey(256);
-    QByteArray AesIv = Cryptor::genAesKey(128);
-    //qDebug() << AesKey.toBase64();
-    //qDebug() << AesIv.toBase64();
-    QByteArray encr  = Cryptor::encryptAes(plain, AesKey, AesIv);
-    //qDebug() << encr.toBase64();
-    QString decr = Cryptor::decryptAes(QByteArray::fromBase64(encr.toBase64()), AesKey, AesIv);
-    qDebug() << decr;
-
-
-    /*RSA *dec_rsa;
-    RSA* enc_rsa;
-    dec_rsa = RSA_generate_key(2048, 3, NULL, NULL);
-    pubKey pkey = Cryptor::genpk(dec_rsa);
-    enc_rsa = Cryptor::constructEncrypt(pkey);
-    QByteArray enced = Cryptor::encr(plain, enc_rsa);
-    qDebug() << enced.toBase64();
-    QString dect = Cryptor::decr(QByteArray::fromBase64(enced.toBase64()), dec_rsa);
-    qDebug() << dect;
-    //EVP_cleanup();
-    //ERR_free_strings();*/
-    //////////////////////////////////////
-
-    QByteArray key = QACrypt::genAesKey(256);
-    QByteArray iv = QACrypt::genAesKey(128);
-
-    qDebug() << "key: " << key.toBase64() << "\n iv: " << iv.toBase64();
-    QString str = "test plaintext ;3 \\ nya kawaii <3  ^^";
-    QByteArray enc = QACrypt::encrypt2(str.toUtf8(), key, iv);
-    qDebug() << enc.toBase64();
-    qDebug() << QString(QACrypt::decrypt2(enc, key, iv));
 
 
 
+}
+
+
+void Core::scp(bool bl)
+{
+    checkComp = bl;
 }
 
 void Core::logIn(QString log, QString pass)
@@ -180,9 +151,14 @@ void Core::clearItmList()
 void Core::addItemToComp(int id)
 {
     Item* itm = items.at(id);
-    comp.addHardware(itm);
-    mw->onItemToComp(itm->getName(), itm->getId());
-    mw->setPrice(comp.recountPrice());
+
+    if(comp.addHardware(itm, checkComp)){
+        mw->onItemToComp(itm->getName(), itm->getId());
+        mw->setPrice(comp.recountPrice());
+    } else {
+        QMessageBox::warning(0, "Ошибка", "Невозможно добавить данный товар к сборке по причине его несовметимости с остальными "
+                                          "товарами. Для отключения данной проверки уберите галочку с пункта \"Совмеcтимость\" над списком товаров.");
+    }
 }
 
 void Core::delItemFromComp(int id)
@@ -276,8 +252,8 @@ void Core::onItemSelectedToMod(int num)
     itemSelectedToModNum = num;
     if(num!=-1){
 
-    Item* itm = items.at(num);
-    mw->showEditWidget(itm->getId(), itm->getName(), itm->getPrice(), 1, openMode::editing);
+        Item* itm = items.at(num);
+        mw->showEditWidget(itm->getId(), itm->getName(), itm->getPrice(), 1, openMode::editing);
 
     } else {
         mw->showEditWidget(-1, "", 0.0, 1, openMode::adding);
@@ -349,11 +325,11 @@ void Core::onSaveReq(openMode sMode, int nnid, QString nnme, float nprce, QList<
         obj["typeId"] = curGr->getId();
     }
 
-        QJsonDocument ard(chrs);
-        QString ss = ard.toJson(QJsonDocument::Compact);
-        obj["chars"] = ss;
-        QJsonDocument ob(obj);
-        con->sendTextMess(ob.toJson(QJsonDocument::Compact));
+    QJsonDocument ard(chrs);
+    QString ss = ard.toJson(QJsonDocument::Compact);
+    obj["chars"] = ss;
+    QJsonDocument ob(obj);
+    con->sendTextMess(ob.toJson(QJsonDocument::Compact));
 }
 
 void Core::onDeleteItm(int ind)

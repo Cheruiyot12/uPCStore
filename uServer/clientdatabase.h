@@ -48,6 +48,7 @@ public slots:
     result deleteUser(int userId);
     result modUser(int uId, QString umail, bool modpass, QString newPerm, QString pass);
     result getInfoAboutOrders();
+    result getLinkedChars();
 private:
 
 

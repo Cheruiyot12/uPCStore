@@ -10,6 +10,11 @@
 #include <QString>
 #include <QDebug>
 
+struct linkedChar {
+    int idChar1;
+    int idChar2;
+};
+
 class Computer : public QObject
 {
     Q_OBJECT
@@ -21,7 +26,7 @@ signals:
 
 public slots:
     QString toJson();
-    void addHardware(Item* itm);
+    bool addHardware(Item* itm, bool cc);
     void delHardware(Item* itm);
     void delHardware(int id);
     //void checkCompability(Item* itm);

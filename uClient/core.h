@@ -24,6 +24,7 @@ class Core : public QObject
     Q_OBJECT
 public:
     explicit Core(QObject *parent = 0);
+    bool checkComp = true;
 
 signals:
 
@@ -44,6 +45,7 @@ public slots:
     void addItemToComp(int id);
     void delItemFromComp(int id);
 
+    void scp(bool bl);
 
 
     void showInfo(int id);
@@ -72,6 +74,8 @@ public slots:
 
     void loadOrders(QJsonArray* arr);
     void openOrdMenu();
+
+
 private:
     MainWindow* mw;
     LoginWidget* lw;

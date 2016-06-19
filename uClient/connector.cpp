@@ -88,6 +88,7 @@ void Connector::onTextMsg(QString msg)
 
         aesKey = keyArr;
         useAes = true;
+        emit this->enableLogin();
     } else if(firObj["type"].toInt() == messType::aesKey){
 
     } else {
@@ -127,6 +128,7 @@ void Connector::onTextMsg(QString msg)
             emit this->clearItms();
             QJsonDocument itmDoc;
             itmDoc = QJsonDocument::fromJson(obj["itmsArr"].toString().toUtf8());
+            qDebug() << itmDoc.toJson(QJsonDocument::Compact);
             QJsonArray itmArr = itmDoc.array();
             for (int i = 0; i < itmArr.size(); i++){
                 emit this->onNewItem(itmArr.at(i).toObject());

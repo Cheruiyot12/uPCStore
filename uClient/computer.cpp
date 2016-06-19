@@ -19,9 +19,24 @@ QString Computer::toJson()
     return doc.toJson(QJsonDocument::Compact);
 }
 
-void Computer::addHardware(Item *itm)
+bool Computer::addHardware(Item *itm, bool cc)
 {
-    hardware.append(itm);
+    bool tt = false;
+    if(hardware.size()>0){
+
+    for(int i = 0; i < hardware.size(); i++){
+        if(Item::checkCompatibility(itm, hardware.at(i)) or !cc){
+            tt = true;
+        } else {
+            tt = false;
+        }
+    }
+    } else {
+        tt = true;
+    }
+    if(tt)
+        hardware.append(itm);
+    return tt;
 }
 
 void Computer::delHardware(Item *itm)

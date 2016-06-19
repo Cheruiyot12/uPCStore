@@ -6,6 +6,7 @@
 #include <QDebug>
 #include <QList>
 #include <QJsonArray>
+#include <QJsonDocument>
 #include <../uServer/commands.h>
 
 class Item : public QObject
@@ -23,6 +24,9 @@ public:
     void addChars(QJsonArray* arr);
     QList<itemChars> *getChars();
     bool isChLoaded(){return charsLoaded;}
+    QList<links> fromLinks;
+    QList<links> toLinks;
+    static bool checkCompatibility(Item *itm1, Item *itm2);
 
 signals:
 
@@ -34,6 +38,7 @@ private:
     QString name;
     double price;
     QList<itemChars> chars;
+
     bool charsLoaded = false;
 
 };

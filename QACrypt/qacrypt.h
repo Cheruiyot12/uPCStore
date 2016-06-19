@@ -5,6 +5,7 @@
 #include <QByteArray>
 #include <openssl/dh.h>
 #include <openssl/bn.h>
+#include <openssl/err.h>
 
 class QACRYPTSHARED_EXPORT QACrypt
 {

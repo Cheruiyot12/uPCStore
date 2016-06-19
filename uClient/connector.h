@@ -42,6 +42,7 @@ signals:
     void onSuccUserMod();
 
     void onOrderList(QJsonArray *arr);
+    void enableLogin();
 public slots:
     void connect2server(QUrl url);
     void sendTextMess(QString msg);
@@ -55,11 +56,9 @@ private:
     QWebSocket cliSocket;
     bool connected = false;
     bool useAes = false;
-    //RSA* enc_rsa;
     QByteArray aesKey;
     DH* myPrivKey;
     QByteArray serverOpenKey;
-    //QByteArray aesKey;
 
 
 };

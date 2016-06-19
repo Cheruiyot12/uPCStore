@@ -327,6 +327,21 @@ void Client::onTextMessage(QString msg)
             }
             break;
         }
+        case getCharLinks:
+        {
+            result res = dataBase->getLinkedChars();
+            if(!res.isError){
+                QJsonObject objct;
+                objct["command"] = reqOrderList;
+                objct["list"] = res.resStr;
+                qDebug() << res.resStr;
+                QJsonDocument doct(objct);
+                this->sendTextMes(doct.toJson(QJsonDocument::Compact));
+            } else {
+                this->sendTextMes(handleError(res.errorCode));
+            }
+            break;
+        }
         default:
             break;
         }

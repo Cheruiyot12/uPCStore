@@ -45,11 +45,11 @@ MainWindow::MainWindow(QWidget *parent)
 
     //inftest->show();
     QPushButton* sendOrder = new QPushButton("Отправить заказ");
-    flay->addWidget(sendOrder,1,0);
+    flay->addWidget(sendOrder,0,0);
 
-    QPushButton *crePrice = new QPushButton("Создать отчет");
-    flay->addWidget(crePrice);
-    connect(crePrice, SIGNAL(clicked(bool)), this, SLOT(onCrePrice()));
+    //QPushButton *crePrice = new QPushButton("Создать отчет");
+    //flay->addWidget(crePrice);
+    //connect(crePrice, SIGNAL(clicked(bool)), this, SLOT(onCrePrice()));
 
     QMenuBar* mainMenuBar = new QMenuBar();
     mainLay->setMenuBar(mainMenuBar);
@@ -71,6 +71,9 @@ MainWindow::MainWindow(QWidget *parent)
     QMenu* aboutMenu = new QMenu("О программе", mainMenuBar);
     mainMenuBar->addMenu(aboutMenu);
 
+    ComBox = new QCheckBox("Совместимость");
+    ComBox->setChecked(true);
+    flay->addWidget(ComBox, 0,2);
 
     connect(catBox, SIGNAL(currentIndexChanged(int)), this, SLOT(onGroupIndexChanged(int)));
     connect(mainList, SIGNAL(itemClicked(QListWidgetItem*)), this, SLOT(onItemClickedToAdd(QListWidgetItem*)));

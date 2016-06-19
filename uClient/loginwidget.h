@@ -8,6 +8,7 @@
 #include <QLineEdit>
 #include <QUrl>
 #include <QPalette>
+#include <QMessageBox>
 
 class LoginWidget : public QWidget
 {
@@ -22,11 +23,13 @@ signals:
 public slots:
     void onLogin();
     void onConnect();
+    void enableLogin();
 private:
     QLineEdit* logLine;
     QLineEdit* passLine;
     QLineEdit* ipLine;
     QPushButton* logIn;
+    QPushButton* conn;
 };
 
 #endif // LOGINWIDGET_H

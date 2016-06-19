@@ -23,6 +23,7 @@
 #include <QMenuBar>
 #include <itemeditwidget.h>
 #include <QFileDialog>
+#include <QCheckBox>
 
 class MainWindow : public QMainWindow
 {
@@ -31,6 +32,7 @@ class MainWindow : public QMainWindow
 public:
     MainWindow(QWidget *parent = 0);
     ~MainWindow();
+    QCheckBox *ComBox;
 public slots:
     void showErr(QString text);
 

@@ -100,8 +100,6 @@ void ItemEditWidget::onSelect()
 
         val->setText(charTabWid->item(charTabWid->currentRow(), 1)->text());
         un->setText(charTabWid->item(charTabWid->currentRow(), 2)->text());
-        //int in = catbox->findText(charTabWid->item(charTabWid->currentRow(), 0)->text());
-        //int in = catbox->findText("KURWA!!!");
         charType->setCurrentText(charTabWid->item(charTabWid->currentRow(), 0)->text());
     }
 
@@ -109,6 +107,7 @@ void ItemEditWidget::onSelect()
 
 void ItemEditWidget::loadChrsNam(QList<chars> *chrs)
 {
+    charType->clear();
     for (int i = 0; i < chrs->size(); i++){
         charType->addItem(chrs->at(i).charname, chrs->at(i).charId);
     }

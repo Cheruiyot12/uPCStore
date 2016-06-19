@@ -25,6 +25,7 @@ static const int delUserc = 19;
 static const int succUserMod = 20;
 static const int reqUserList = 21;
 static const int reqOrderList = 22;
+static const int getCharLinks = 23;
 
 
 
@@ -65,6 +66,12 @@ enum messType {
 struct chars{
     int charId = -1;
     QString charname = "";
+};
+
+struct links{
+    int char1 = -1;
+    QString val = "";
+    int char2 = -1;
 };
 
 #endif // COMMANDS
