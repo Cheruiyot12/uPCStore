@@ -17,7 +17,8 @@
 //#include "cryptor.h"
 #include <qacrypt.h>
 #include <orderwidget.h>
-
+#include <chareditwidget.h>
+#include <QAction>
 
 class Core : public QObject
 {
@@ -75,6 +76,7 @@ public slots:
     void loadOrders(QJsonArray* arr);
     void openOrdMenu();
 
+    void opCw();
 
 private:
     MainWindow* mw;
@@ -90,6 +92,7 @@ private:
     int itemSelectedToModNum = -1;
     UserWidget* uw;
     orderWidget *ordw;
+    CharEditWidget *cw;
 
 
 

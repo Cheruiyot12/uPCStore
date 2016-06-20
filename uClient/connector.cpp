@@ -231,6 +231,26 @@ void Connector::onTextMsg(QString msg)
             ordArr = ordDoc.array();
             emit this->onOrderList(&ordArr);
         }
+        case getCharsWithTypes:
+        {
+            QJsonDocument odcc;
+            QJsonArray arrr;
+            odcc = QJsonDocument::fromJson(obj["list"].toString().toUtf8());
+            arrr = odcc.array();
+
+            emit this->GodOfCharsAppears(&arrr);
+            break;
+        }
+        case getCharLinks:
+        {
+            QJsonDocument odcc;
+            QJsonArray arrr;
+            odcc = QJsonDocument::fromJson(obj["list"].toString().toUtf8());
+            arrr = odcc.array();
+
+            emit this->LinksKing(&arrr);
+            break;
+        }
         default:
             break;
         }

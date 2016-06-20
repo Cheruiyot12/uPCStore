@@ -43,6 +43,9 @@ signals:
 
     void onOrderList(QJsonArray *arr);
     void enableLogin();
+
+    void GodOfCharsAppears(QJsonArray *ar);
+    void LinksKing(QJsonArray *ar);
 public slots:
     void connect2server(QUrl url);
     void sendTextMess(QString msg);

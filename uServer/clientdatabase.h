@@ -49,6 +49,9 @@ public slots:
     result modUser(int uId, QString umail, bool modpass, QString newPerm, QString pass);
     result getInfoAboutOrders();
     result getLinkedChars();
+    result getCharsWithTypes();
+    result adLin(int l1, int l2);
+    result delLin(int l1, int l2);
 private:
 
 

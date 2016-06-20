@@ -445,7 +445,6 @@ result ClientDatabase::getLinkedChars()
             grp["typeName2"] = query.value(6).toString();
             grp["charName2"] = query.value(7).toString();
             arr.append(grp);
-
         }
         QJsonDocument doc(arr);
         res.resStr = doc.toJson(QJsonDocument::Compact);
@@ -457,5 +456,60 @@ result ClientDatabase::getLinkedChars()
     }
     return res;
 
+
+}
+
+
+result ClientDatabase::getCharsWithTypes()
+{
+    result res;
+    QSqlQuery query;
+    QJsonArray arr;
+
+    if(query.exec(QString("SELECT * FROM chars INNER JOIN item_types ON chars.id_item_owner_type = item_types.id_item_type;"))){
+        while(query.next()){
+            QJsonObject objct;
+            objct["charId"] = query.value(0).toInt();
+            objct["charName"] = query.value(1).toString();
+            objct["typeId"] = query.value(2).toInt();
+            objct["typeName"] = query.value(4).toString();
+
+            arr.append(objct);
+
+        }
+        QJsonDocument doc(arr);
+        res.resStr = doc.toJson(QJsonDocument::Compact);
+    } else {
+        qDebug() << "failed on getcharswithtype";
+        qDebug() << query.lastError().databaseText();
+        res.isError = true;
+        res.errorCode = query.lastError().number();
+    }
+    return res;
+}
+
+result ClientDatabase::adLin(int l1, int l2)
+{
+    QSqlQuery query;
+    result res;
+    if(!query.exec(QString("INSERT INTO chars_link VALUES(%1, %2)").arg(l1).arg(l2))){
+        qDebug() << "failed on adLin";
+        qDebug() << query.lastError().databaseText();
+        res.isError = true;
+        res.errorCode = query.lastError().number();
+    }
+    return res;
+}
+result ClientDatabase::delLin(int l1, int l2)
+{
+    QSqlQuery query;
+    result res;
+    if(!query.exec(QString("DELETE FROM chars_link WHERE id_char1 = %1 AND id_char2 = %2").arg(l1).arg(l2))){
+        qDebug() << "failed on delLin";
+        qDebug() << query.lastError().databaseText();
+        res.isError = true;
+        res.errorCode = query.lastError().number();
+    }
+    return res;
 
 }

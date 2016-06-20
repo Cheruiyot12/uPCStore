@@ -26,6 +26,10 @@ static const int succUserMod = 20;
 static const int reqUserList = 21;
 static const int reqOrderList = 22;
 static const int getCharLinks = 23;
+static const int getCharsWithTypes = 24;
+static const int dellLink = 25;
+static const int addLink = 26;
+static const int succLink = 27;
 
 
 
@@ -72,6 +76,13 @@ struct links{
     int char1 = -1;
     QString val = "";
     int char2 = -1;
+};
+
+struct chss{
+    int idChar;
+    QString namChar;
+    int idType;
+    QString namType;
 };
 
 #endif // COMMANDS

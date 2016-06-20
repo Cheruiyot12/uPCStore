@@ -332,9 +332,50 @@ void Client::onTextMessage(QString msg)
             result res = dataBase->getLinkedChars();
             if(!res.isError){
                 QJsonObject objct;
-                objct["command"] = reqOrderList;
+                objct["command"] = getCharLinks;
+                objct["list"] = res.resStr;
+                //qDebug() << res.resStr;
+                QJsonDocument doct(objct);
+                this->sendTextMes(doct.toJson(QJsonDocument::Compact));
+            } else {
+                this->sendTextMes(handleError(res.errorCode));
+            }
+            break;
+        }
+        case getCharsWithTypes:
+        {
+            result res = dataBase->getCharsWithTypes();
+            if(!res.isError){
+                QJsonObject objct;
+                objct["command"] = getCharsWithTypes;
                 objct["list"] = res.resStr;
                 qDebug() << res.resStr;
+                QJsonDocument doct(objct);
+                this->sendTextMes(doct.toJson(QJsonDocument::Compact));
+            } else {
+                this->sendTextMes(handleError(res.errorCode));
+            }
+            break;
+        }
+        case dellLink:
+        {
+            result res = dataBase->delLin(obj["charId1"].toInt(), obj["charId2"].toInt());
+            if(!res.isError){
+                QJsonObject objct;
+                objct["command"] = succLink;
+                QJsonDocument doct(objct);
+                this->sendTextMes(doct.toJson(QJsonDocument::Compact));
+            } else {
+                this->sendTextMes(handleError(res.errorCode));
+            }
+            break;
+        }
+        case addLink:
+        {
+            result res = dataBase->adLin(obj["charId1"].toInt(), obj["charId2"].toInt());
+            if(!res.isError){
+                QJsonObject objct;
+                objct["command"] = succLink;
                 QJsonDocument doct(objct);
                 this->sendTextMes(doct.toJson(QJsonDocument::Compact));
             } else {

@@ -6,6 +6,7 @@ Core::Core(QObject *parent) : QObject(parent)
     mw = new MainWindow();
     lw = new LoginWidget();
     ordw = new orderWidget();
+    cw = new CharEditWidget();
 }
 
 void Core::showInterface()
@@ -43,16 +44,33 @@ void Core::showInterface()
     connect(con, SIGNAL(onOrderList(QJsonArray*)), this, SLOT(loadOrders(QJsonArray*)));
     connect(con, SIGNAL(enableLogin()), lw, SLOT(enableLogin()));
     connect(mw->ComBox, SIGNAL(clicked(bool)), this, SLOT(scp(bool)));
+    connect(con, SIGNAL(GodOfCharsAppears(QJsonArray*)), cw, SLOT(loadChars(QJsonArray*)));
+    connect(con, SIGNAL(LinksKing(QJsonArray*)), cw, SLOT(loadLinks(QJsonArray*)));
+    connect(mw->chAct, SIGNAL(triggered(bool)), this, SLOT(opCw()));
+    connect(cw, SIGNAL(adls(QString)), con, SLOT(sendTextMess(QString)));
+    connect(cw, SIGNAL(dels(QString)), con, SLOT(sendTextMess(QString)));
     lw->show();
-
-
-
 }
 
 
 void Core::scp(bool bl)
 {
     checkComp = bl;
+}
+
+void Core::opCw()
+{
+    cw->show();
+    QJsonObject obb;
+    obb["command"] = getCharLinks;
+    QJsonDocument uDoc(obb);
+    con->sendTextMess(uDoc.toJson(QJsonDocument::Compact));
+
+    QJsonObject obb2;
+
+    obb2["command"] = getCharsWithTypes;
+    QJsonDocument uDo2(obb2);
+    con->sendTextMess(uDo2.toJson(QJsonDocument::Compact));
 }
 
 void Core::logIn(QString log, QString pass)

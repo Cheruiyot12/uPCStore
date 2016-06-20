@@ -30,7 +30,8 @@ SOURCES += main.cpp\
     iteminfowidget.cpp \
     itemeditwidget.cpp \
     userwidget.cpp \
-    orderwidget.cpp
+    orderwidget.cpp \
+    chareditwidget.cpp
 
 HEADERS  += mainwindow.h \
     connector.h \
@@ -42,7 +43,8 @@ HEADERS  += mainwindow.h \
     iteminfowidget.h \
     itemeditwidget.h \
     userwidget.h \
-    orderwidget.h
+    orderwidget.h \
+    chareditwidget.h
 
 win32:CONFIG(release, debug|release): LIBS += -L$$OUT_PWD/../QACrypt/release/ -lQACrypt
 else:win32:CONFIG(debug, debug|release): LIBS += -L$$OUT_PWD/../QACrypt/debug/ -lQACrypt

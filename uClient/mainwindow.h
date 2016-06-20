@@ -24,6 +24,7 @@
 #include <itemeditwidget.h>
 #include <QFileDialog>
 #include <QCheckBox>
+#include <QAction>
 
 class MainWindow : public QMainWindow
 {
@@ -33,6 +34,7 @@ public:
     MainWindow(QWidget *parent = 0);
     ~MainWindow();
     QCheckBox *ComBox;
+    QAction* chAct;
 public slots:
     void showErr(QString text);
 

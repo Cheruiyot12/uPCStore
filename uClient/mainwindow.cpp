@@ -75,6 +75,8 @@ MainWindow::MainWindow(QWidget *parent)
     ComBox->setChecked(true);
     flay->addWidget(ComBox, 0,2);
 
+    chAct = new QAction("Управление характеристиками", adminMenu);
+
     connect(catBox, SIGNAL(currentIndexChanged(int)), this, SLOT(onGroupIndexChanged(int)));
     connect(mainList, SIGNAL(itemClicked(QListWidgetItem*)), this, SLOT(onItemClickedToAdd(QListWidgetItem*)));
     connect(compList, SIGNAL(customContextMenuRequested(QPoint)), this, SLOT(showCompContextMenu(QPoint)));
@@ -215,6 +217,8 @@ void MainWindow::requestPermissionsClicked()
 void MainWindow::activateSellerMode()
 {
     mainList->setContextMenuPolicy(Qt::CustomContextMenu);
+    adminMenu->addAction(chAct);
+    //connect(chAct, SIGNAL())
     connect(mainList, SIGNAL(customContextMenuRequested(QPoint)), this, SLOT(showMainContextMenu(QPoint)));
 }
 
